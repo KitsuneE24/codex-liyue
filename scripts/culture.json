@@ -1,0 +1,23 @@
+{
+  "_note": "Nom chinois tel qu'affiché en jeu (règle uniforme pour les vingt). Clés = identifiants de l'API.",
+  "baizhu":    { "hanzi": "白术", "pinyin": "Bái Zhú" },
+  "beidou":    { "hanzi": "北斗", "pinyin": "Běi Dǒu" },
+  "chongyun":  { "hanzi": "重云", "pinyin": "Chóng Yún" },
+  "gaming":    { "hanzi": "嘉明", "pinyin": "Jiā Míng" },
+  "ganyu":     { "hanzi": "甘雨", "pinyin": "Gān Yǔ" },
+  "hu-tao":    { "hanzi": "胡桃", "pinyin": "Hú Táo" },
+  "keqing":    { "hanzi": "刻晴", "pinyin": "Kè Qíng" },
+  "ningguang": { "hanzi": "凝光", "pinyin": "Níng Guāng" },
+  "qiqi":      { "hanzi": "七七", "pinyin": "Qī Qī" },
+  "shenhe":    { "hanzi": "申鹤", "pinyin": "Shēn Hè" },
+  "xiangling": { "hanzi": "香菱", "pinyin": "Xiāng Líng" },
+  "xianyun":   { "hanzi": "闲云", "pinyin": "Xián Yún" },
+  "xiao":      { "hanzi": "魈",   "pinyin": "Xiāo" },
+  "xingqiu":   { "hanzi": "行秋", "pinyin": "Xíng Qiū" },
+  "xinyan":    { "hanzi": "辛焱", "pinyin": "Xīn Yàn" },
+  "yanfei":    { "hanzi": "烟绯", "pinyin": "Yān Fēi" },
+  "yaoyao":    { "hanzi": "瑶瑶", "pinyin": "Yáo Yáo" },
+  "yelan":     { "hanzi": "夜兰", "pinyin": "Yè Lán" },
+  "yun-jin":   { "hanzi": "云堇", "pinyin": "Yún Jǐn" },
+  "zhongli":   { "hanzi": "钟离", "pinyin": "Zhōng Lí" }
+}

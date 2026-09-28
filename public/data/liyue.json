@@ -1,0 +1,419 @@
+{
+  "meta": {
+    "source": "https://genshin.jmp.blue (github.com/genshindev/api)",
+    "builtAt": "2026-09-28T10:25:20.819Z",
+    "count": 20
+  },
+  "elements": {
+    "Anemo": {
+      "color": "#74c2a8",
+      "hanzi": "风"
+    },
+    "Cryo": {
+      "color": "#9fd6e3",
+      "hanzi": "冰"
+    },
+    "Dendro": {
+      "color": "#a5c83b",
+      "hanzi": "草"
+    },
+    "Electro": {
+      "color": "#b08fc2",
+      "hanzi": "雷"
+    },
+    "Geo": {
+      "color": "#f2b723",
+      "hanzi": "岩"
+    },
+    "Hydro": {
+      "color": "#4cc2f1",
+      "hanzi": "水"
+    },
+    "Pyro": {
+      "color": "#ef7938",
+      "hanzi": "火"
+    }
+  },
+  "characters": [
+    {
+      "id": "baizhu",
+      "game": {
+        "name": "Baizhu",
+        "title": "Beyond Mortality",
+        "vision": "Dendro",
+        "weapon": "Catalyst",
+        "rarity": 5,
+        "release": "2023-05-02",
+        "affiliation": "Bubu Pharmacy",
+        "constellation": "Lagenaria",
+        "description": "The owner of Bubu Pharmacy, who is rarely seen without the white snake named Changsheng. His medicinal knowledge is encyclopedic, and his personal intrigues subtle."
+      },
+      "culture": {
+        "hanzi": "白术",
+        "pinyin": "Bái Zhú"
+      },
+      "portrait": "/img/characters/baizhu.webp"
+    },
+    {
+      "id": "beidou",
+      "game": {
+        "name": "Beidou",
+        "title": "Uncrowned Lord of the Ocean",
+        "vision": "Electro",
+        "weapon": "Claymore",
+        "rarity": 4,
+        "release": "2020-09-28",
+        "affiliation": "The Crux",
+        "constellation": "Victor Mare",
+        "description": "Captain of her crew, The Crux. She's quite an unbound and forthright woman."
+      },
+      "culture": {
+        "hanzi": "北斗",
+        "pinyin": "Běi Dǒu"
+      },
+      "portrait": "/img/characters/beidou.webp"
+    },
+    {
+      "id": "chongyun",
+      "game": {
+        "name": "Chongyun",
+        "title": "Frozen Ardor",
+        "vision": "Cryo",
+        "weapon": "Claymore",
+        "rarity": 4,
+        "release": "2020-09-28",
+        "affiliation": "Liyue Harbor",
+        "constellation": "Nubis Caesor",
+        "description": "A young exorcist from a family of exorcists. He does everything he can to suppress his abundance of yang energy."
+      },
+      "culture": {
+        "hanzi": "重云",
+        "pinyin": "Chóng Yún"
+      },
+      "portrait": "/img/characters/chongyun.webp"
+    },
+    {
+      "id": "gaming",
+      "game": {
+        "name": "Gaming",
+        "title": "Leonine Vanguard",
+        "vision": "Pyro",
+        "weapon": "Claymore",
+        "rarity": 4,
+        "release": "2024-01-31",
+        "affiliation": "Sword and Strongbox Secure Transport Agency",
+        "constellation": "Leo Expergiscens",
+        "description": "Guard of the Sword and Strongbox Secure Transport Agency, and the head of the \"Mighty Mythical Beasts\" Wushou troupe."
+      },
+      "culture": {
+        "hanzi": "嘉明",
+        "pinyin": "Jiā Míng"
+      },
+      "portrait": "/img/characters/gaming.webp"
+    },
+    {
+      "id": "ganyu",
+      "game": {
+        "name": "Ganyu",
+        "title": "Plenilune Gaze",
+        "vision": "Cryo",
+        "weapon": "Bow",
+        "rarity": 5,
+        "release": "2021-01-12",
+        "affiliation": "Yuehai Pavilion",
+        "constellation": "Sinae Unicornis",
+        "description": "The secretary at Yuehai Pavilion. The blood of the qilin, an illuminated beast, flows within her veins."
+      },
+      "culture": {
+        "hanzi": "甘雨",
+        "pinyin": "Gān Yǔ"
+      },
+      "portrait": "/img/characters/ganyu.webp"
+    },
+    {
+      "id": "hu-tao",
+      "game": {
+        "name": "Hu Tao",
+        "title": "Fragrance in Thaw",
+        "vision": "Pyro",
+        "weapon": "Polearm",
+        "rarity": 5,
+        "release": "2021-03-02",
+        "affiliation": "Wangsheng Funeral Parlor",
+        "constellation": "Papilio Charontis",
+        "description": "The 77th Director of the Wangsheng Funeral Parlor. She took over the business at a rather young age."
+      },
+      "culture": {
+        "hanzi": "胡桃",
+        "pinyin": "Hú Táo"
+      },
+      "portrait": "/img/characters/hu-tao.webp"
+    },
+    {
+      "id": "keqing",
+      "game": {
+        "name": "Keqing",
+        "title": "Driving Thunder",
+        "vision": "Electro",
+        "weapon": "Sword",
+        "rarity": 5,
+        "release": "2020-09-28",
+        "affiliation": "Liyue Qixing",
+        "constellation": "Trulla Cementarii",
+        "description": "The Yuheng of the Liyue Qixing. Has much to say about Rex Lapis' unilateral approach to policymaking in Liyue - but in truth, gods admire skeptics such as her quite a lot."
+      },
+      "culture": {
+        "hanzi": "刻晴",
+        "pinyin": "Kè Qíng"
+      },
+      "portrait": "/img/characters/keqing.webp"
+    },
+    {
+      "id": "ningguang",
+      "game": {
+        "name": "Ningguang",
+        "title": "Eclipsing Star",
+        "vision": "Geo",
+        "weapon": "Catalyst",
+        "rarity": 4,
+        "release": "2020-09-28",
+        "affiliation": "Liyue Qixing",
+        "constellation": "Opus Aequilibrium",
+        "description": "The Tianquan of Liyue Qixing. Her wealth is unsurpassed in all of Teyvat."
+      },
+      "culture": {
+        "hanzi": "凝光",
+        "pinyin": "Níng Guāng"
+      },
+      "portrait": "/img/characters/ningguang.webp"
+    },
+    {
+      "id": "qiqi",
+      "game": {
+        "name": "Qiqi",
+        "title": "Icy Resurrection",
+        "vision": "Cryo",
+        "weapon": "Sword",
+        "rarity": 5,
+        "release": "2020-09-28",
+        "affiliation": "Bubu Pharmacy",
+        "constellation": "Pristina Nola",
+        "description": "An apprentice and herb gatherer at Bubu Pharmacy. An undead with a bone-white complexion, she seldom has much in the way of words or emotion."
+      },
+      "culture": {
+        "hanzi": "七七",
+        "pinyin": "Qī Qī"
+      },
+      "portrait": "/img/characters/qiqi.webp"
+    },
+    {
+      "id": "shenhe",
+      "game": {
+        "name": "Shenhe",
+        "title": "Lonesome Transcendence",
+        "vision": "Cryo",
+        "weapon": "Polearm",
+        "rarity": 5,
+        "release": "2022-01-05",
+        "affiliation": "Liyue Harbor",
+        "constellation": "Crista Doloris",
+        "description": "An adepti disciple with a most unusual air about her. Having spent much time cultivating in isolation in Liyue's mountains, she has become every bit as cool and distant as the adepti themselves."
+      },
+      "culture": {
+        "hanzi": "申鹤",
+        "pinyin": "Shēn Hè"
+      },
+      "portrait": "/img/characters/shenhe.webp"
+    },
+    {
+      "id": "xiangling",
+      "game": {
+        "name": "Xiangling",
+        "title": "Exquisite Delicacy",
+        "vision": "Pyro",
+        "weapon": "Polearm",
+        "rarity": 4,
+        "release": "2020-09-28",
+        "affiliation": "Wanmin Restaurant",
+        "constellation": "Trulla",
+        "description": "A renowned chef from Liyue. She's extremely passionate about cooking and excels at making her signature hot and spicy dishes."
+      },
+      "culture": {
+        "hanzi": "香菱",
+        "pinyin": "Xiāng Líng"
+      },
+      "portrait": "/img/characters/xiangling.webp"
+    },
+    {
+      "id": "xianyun",
+      "game": {
+        "name": "Xianyun",
+        "title": "Passerine Herald",
+        "vision": "Anemo",
+        "weapon": "Catalyst",
+        "rarity": 5,
+        "release": "2024-01-31",
+        "affiliation": "Mt. Aocang",
+        "constellation": "Grus Serena",
+        "description": "One of the Mighty and Illuminated Adepti of Jueyun, known as \"Cloud Retainer.\" Expert in all kinds of mechanical contraptions, her heart now turns towards the affairs of the mortal world, through which she walks under the name \"Xianyun.\""
+      },
+      "culture": {
+        "hanzi": "闲云",
+        "pinyin": "Xián Yún"
+      },
+      "portrait": "/img/characters/xianyun.webp"
+    },
+    {
+      "id": "xiao",
+      "game": {
+        "name": "Xiao",
+        "title": "Vigilant Yaksha",
+        "vision": "Anemo",
+        "weapon": "Polearm",
+        "rarity": 5,
+        "release": "2021-02-03",
+        "affiliation": "Liyue Adeptus",
+        "constellation": "Alatus Nemeseos",
+        "description": "A yaksha adeptus that defends Liyue. Also heralded as the \"Conqueror of Demons\" and \"Vigilant Yaksha.\""
+      },
+      "culture": {
+        "hanzi": "魈",
+        "pinyin": "Xiāo"
+      },
+      "portrait": "/img/characters/xiao.webp"
+    },
+    {
+      "id": "xingqiu",
+      "game": {
+        "name": "Xingqiu",
+        "title": "Juvenile Galant",
+        "vision": "Hydro",
+        "weapon": "Sword",
+        "rarity": 4,
+        "release": "2020-09-28",
+        "affiliation": "Feiyun Commerce Guild",
+        "constellation": "Fabulae Textile",
+        "description": "A young man carrying a longsword who is frequently seen at book booths. He has a chivalrous heart and yearns for justice and fairness for all."
+      },
+      "culture": {
+        "hanzi": "行秋",
+        "pinyin": "Xíng Qiū"
+      },
+      "portrait": "/img/characters/xingqiu.webp"
+    },
+    {
+      "id": "xinyan",
+      "game": {
+        "name": "Xinyan",
+        "title": "Blazing Riff",
+        "vision": "Pyro",
+        "weapon": "Claymore",
+        "rarity": 4,
+        "release": "2020-12-01",
+        "affiliation": "Liyue Harbor",
+        "constellation": "Fila Ignium",
+        "description": "Liyue's sole rock 'n' roll musician. She rebels against ossified prejudices using her music and passionate singing."
+      },
+      "culture": {
+        "hanzi": "辛焱",
+        "pinyin": "Xīn Yàn"
+      },
+      "portrait": "/img/characters/xinyan.webp"
+    },
+    {
+      "id": "yanfei",
+      "game": {
+        "name": "Yanfei",
+        "title": "Wise Innocence",
+        "vision": "Pyro",
+        "weapon": "Catalyst",
+        "rarity": 4,
+        "release": "2021-04-28",
+        "affiliation": "Liyue Harbor Adepti",
+        "constellation": "Bestia Iustitia",
+        "description": "A well-known legal adviser active in Liyue Harbor. A brilliant young lady in whose veins runs the blood of an illuminated beast."
+      },
+      "culture": {
+        "hanzi": "烟绯",
+        "pinyin": "Yān Fēi"
+      },
+      "portrait": "/img/characters/yanfei.webp"
+    },
+    {
+      "id": "yaoyao",
+      "game": {
+        "name": "Yaoyao",
+        "title": "Burgeoning Grace",
+        "vision": "Dendro",
+        "weapon": "Polearm",
+        "rarity": 4,
+        "release": "2023-01-18",
+        "affiliation": "Streetward Rambler's Abode",
+        "constellation": "Osmanthus",
+        "description": "Streetward Rambler's youngest disciple. A gentle and caring “little adult.”"
+      },
+      "culture": {
+        "hanzi": "瑶瑶",
+        "pinyin": "Yáo Yáo"
+      },
+      "portrait": "/img/characters/yaoyao.webp"
+    },
+    {
+      "id": "yelan",
+      "game": {
+        "name": "Yelan",
+        "title": "Valley Orchid",
+        "vision": "Hydro",
+        "weapon": "Bow",
+        "rarity": 5,
+        "release": "2022-05-31",
+        "affiliation": "Yanshang Teahouse",
+        "constellation": "Umbrabilis Orchis",
+        "description": "A mysterious person who claims to work for the Ministry of Civil Affairs, but is a \"non-entity\" on the Ministry of Civil Affairs' list."
+      },
+      "culture": {
+        "hanzi": "夜兰",
+        "pinyin": "Yè Lán"
+      },
+      "portrait": "/img/characters/yelan.webp"
+    },
+    {
+      "id": "yun-jin",
+      "game": {
+        "name": "Yun Jin",
+        "title": "Stage Lucida",
+        "vision": "Geo",
+        "weapon": "Polearm",
+        "rarity": 4,
+        "release": "2022-01-05",
+        "affiliation": "Yun-Han Opera Troupe",
+        "constellation": "Opera Grandis",
+        "description": "A renowned Liyue opera singer who is skilled in both playwriting and singing. Her style is one-of-a-kind, exquisite and delicate, much like the person herself."
+      },
+      "culture": {
+        "hanzi": "云堇",
+        "pinyin": "Yún Jǐn"
+      },
+      "portrait": "/img/characters/yun-jin.webp"
+    },
+    {
+      "id": "zhongli",
+      "game": {
+        "name": "Zhongli",
+        "title": "Vago Mundo",
+        "vision": "Geo",
+        "weapon": "Polearm",
+        "rarity": 5,
+        "release": "2020-12-01",
+        "affiliation": "Liyue Harbor",
+        "constellation": "Lapis Dei",
+        "description": "A mysterious expert contracted by the Wangsheng Funeral Parlor. Extremely knowledgeable in all things."
+      },
+      "culture": {
+        "hanzi": "钟离",
+        "pinyin": "Zhōng Lí"
+      },
+      "portrait": "/img/characters/zhongli.webp"
+    }
+  ]
+}

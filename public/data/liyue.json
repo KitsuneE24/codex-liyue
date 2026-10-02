@@ -1,7 +1,9 @@
 {
   "meta": {
     "source": "https://genshin.jmp.blue (github.com/genshindev/api)",
-    "builtAt": "2026-09-28T10:25:20.819Z",
+    "strokes": "https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0 (Make Me a Hanzi)",
+    "characters": "https://cdn.jsdelivr.net/gh/skishore/makemeahanzi@master/dictionary.txt (Make Me a Hanzi : sens, clé, décomposition)",
+    "builtAt": "2026-10-02T05:19:01.207Z",
     "count": 20
   },
   "elements": {
@@ -34,6 +36,94 @@
       "hanzi": "火"
     }
   },
+  "constellation": {
+    "edges": [
+      [
+        "sommet",
+        "sceau-haut"
+      ],
+      [
+        "sceau-haut",
+        "sceau-coeur"
+      ],
+      [
+        "sceau-coeur",
+        "pilier-haut"
+      ],
+      [
+        "pilier-haut",
+        "pilier-losange"
+      ],
+      [
+        "pilier-losange",
+        "socle"
+      ],
+      [
+        "sceau-haut",
+        "g-toit"
+      ],
+      [
+        "g-toit",
+        "g-angle"
+      ],
+      [
+        "g-angle",
+        "g-plateau"
+      ],
+      [
+        "sceau-coeur",
+        "g-fleau"
+      ],
+      [
+        "g-fleau",
+        "g-attache"
+      ],
+      [
+        "g-attache",
+        "g-gemme-ext"
+      ],
+      [
+        "g-attache",
+        "g-gemme-int"
+      ],
+      [
+        "g-gemme-ext",
+        "g-gemme-int"
+      ],
+      [
+        "sceau-haut",
+        "d-toit"
+      ],
+      [
+        "d-toit",
+        "d-angle"
+      ],
+      [
+        "d-angle",
+        "d-plateau"
+      ],
+      [
+        "sceau-coeur",
+        "d-fleau"
+      ],
+      [
+        "d-fleau",
+        "d-attache"
+      ],
+      [
+        "d-attache",
+        "d-gemme-ext"
+      ],
+      [
+        "d-attache",
+        "d-gemme-int"
+      ],
+      [
+        "d-gemme-ext",
+        "d-gemme-int"
+      ]
+    ]
+  },
   "characters": [
     {
       "id": "baizhu",
@@ -50,7 +140,33 @@
       },
       "culture": {
         "hanzi": "白术",
-        "pinyin": "Bái Zhú"
+        "pinyin": "Bái Zhú",
+        "chars": [
+          {
+            "char": "白",
+            "reading": "Bái",
+            "definition": "white; clear, pure, unblemished; bright",
+            "strokes": 5,
+            "radical": "白",
+            "kangxi": 106,
+            "decomposition": "⿻？日"
+          },
+          {
+            "char": "术",
+            "reading": "Zhú",
+            "definition": "skill, art; method, technique; trick",
+            "strokes": 5,
+            "radical": "木",
+            "kangxi": 75,
+            "decomposition": "⿺木丶"
+          }
+        ],
+        "totalStrokes": 10
+      },
+      "node": {
+        "id": "d-plateau",
+        "u": 0.7344,
+        "v": -0.3906
       },
       "portrait": "/img/characters/baizhu.webp"
     },
@@ -69,7 +185,33 @@
       },
       "culture": {
         "hanzi": "北斗",
-        "pinyin": "Běi Dǒu"
+        "pinyin": "Běi Dǒu",
+        "chars": [
+          {
+            "char": "北",
+            "reading": "Běi",
+            "definition": "north; northern; northward",
+            "strokes": 5,
+            "radical": "匕",
+            "kangxi": 21,
+            "decomposition": "⿰？匕"
+          },
+          {
+            "char": "斗",
+            "reading": "Dǒu",
+            "definition": "to struggle, to fight, to contend; measuring cup",
+            "strokes": 4,
+            "radical": "斗",
+            "kangxi": 68,
+            "decomposition": "⿻十？"
+          }
+        ],
+        "totalStrokes": 9
+      },
+      "node": {
+        "id": "d-fleau",
+        "u": 0.6875,
+        "v": 0.4063
       },
       "portrait": "/img/characters/beidou.webp"
     },
@@ -88,7 +230,33 @@
       },
       "culture": {
         "hanzi": "重云",
-        "pinyin": "Chóng Yún"
+        "pinyin": "Chóng Yún",
+        "chars": [
+          {
+            "char": "重",
+            "reading": "Chóng",
+            "definition": "heavy, weighty; to double, to repeat",
+            "strokes": 9,
+            "radical": "里",
+            "kangxi": 166,
+            "decomposition": "⿻千里"
+          },
+          {
+            "char": "云",
+            "reading": "Yún",
+            "definition": "cloud; to say, to speak",
+            "strokes": 4,
+            "radical": "二",
+            "kangxi": 7,
+            "decomposition": "⿱二厶"
+          }
+        ],
+        "totalStrokes": 13
+      },
+      "node": {
+        "id": "d-attache",
+        "u": 0.4375,
+        "v": 0.1719
       },
       "portrait": "/img/characters/chongyun.webp"
     },
@@ -107,7 +275,33 @@
       },
       "culture": {
         "hanzi": "嘉明",
-        "pinyin": "Jiā Míng"
+        "pinyin": "Jiā Míng",
+        "chars": [
+          {
+            "char": "嘉",
+            "reading": "Jiā",
+            "definition": "excellent; joyful; auspicious",
+            "strokes": 14,
+            "radical": "口",
+            "kangxi": 30,
+            "decomposition": "⿱壴加"
+          },
+          {
+            "char": "明",
+            "reading": "Míng",
+            "definition": "bright, clear; to explain, to understand, to shed light",
+            "strokes": 8,
+            "radical": "日",
+            "kangxi": 72,
+            "decomposition": "⿰日月"
+          }
+        ],
+        "totalStrokes": 22
+      },
+      "node": {
+        "id": "d-gemme-ext",
+        "u": 0.6406,
+        "v": -0.1094
       },
       "portrait": "/img/characters/gaming.webp"
     },
@@ -126,7 +320,33 @@
       },
       "culture": {
         "hanzi": "甘雨",
-        "pinyin": "Gān Yǔ"
+        "pinyin": "Gān Yǔ",
+        "chars": [
+          {
+            "char": "甘",
+            "reading": "Gān",
+            "definition": "sweet, tasty; willing",
+            "strokes": 5,
+            "radical": "甘",
+            "kangxi": 99,
+            "decomposition": "⿵卄二"
+          },
+          {
+            "char": "雨",
+            "reading": "Yǔ",
+            "definition": "rain",
+            "strokes": 8,
+            "radical": "雨",
+            "kangxi": 173,
+            "decomposition": "⿻帀？"
+          }
+        ],
+        "totalStrokes": 13
+      },
+      "node": {
+        "id": "g-fleau",
+        "u": -0.6875,
+        "v": 0.4063
       },
       "portrait": "/img/characters/ganyu.webp"
     },
@@ -145,7 +365,33 @@
       },
       "culture": {
         "hanzi": "胡桃",
-        "pinyin": "Hú Táo"
+        "pinyin": "Hú Táo",
+        "chars": [
+          {
+            "char": "胡",
+            "reading": "Hú",
+            "definition": "recklessly, foolishly; wildly",
+            "strokes": 9,
+            "radical": "⺼",
+            "kangxi": 130,
+            "decomposition": "⿰古⺼"
+          },
+          {
+            "char": "桃",
+            "reading": "Táo",
+            "definition": "peach; marriage; surname",
+            "strokes": 10,
+            "radical": "木",
+            "kangxi": 75,
+            "decomposition": "⿰木兆"
+          }
+        ],
+        "totalStrokes": 19
+      },
+      "node": {
+        "id": "pilier-losange",
+        "u": 0,
+        "v": -0.4375
       },
       "portrait": "/img/characters/hu-tao.webp"
     },
@@ -164,7 +410,33 @@
       },
       "culture": {
         "hanzi": "刻晴",
-        "pinyin": "Kè Qíng"
+        "pinyin": "Kè Qíng",
+        "chars": [
+          {
+            "char": "刻",
+            "reading": "Kè",
+            "definition": "to carve, to engrave; a quarter hour; a moment",
+            "strokes": 8,
+            "radical": "刂",
+            "kangxi": 18,
+            "decomposition": "⿰亥刂"
+          },
+          {
+            "char": "晴",
+            "reading": "Qíng",
+            "definition": "clear weather, fine weather",
+            "strokes": 12,
+            "radical": "日",
+            "kangxi": 72,
+            "decomposition": "⿰日青"
+          }
+        ],
+        "totalStrokes": 20
+      },
+      "node": {
+        "id": "pilier-haut",
+        "u": 0,
+        "v": 0.0938
       },
       "portrait": "/img/characters/keqing.webp"
     },
@@ -183,7 +455,33 @@
       },
       "culture": {
         "hanzi": "凝光",
-        "pinyin": "Níng Guāng"
+        "pinyin": "Níng Guāng",
+        "chars": [
+          {
+            "char": "凝",
+            "reading": "Níng",
+            "definition": "to coagulate, to congeal; to freeze",
+            "strokes": 16,
+            "radical": "冫",
+            "kangxi": 15,
+            "decomposition": "⿰冫疑"
+          },
+          {
+            "char": "光",
+            "reading": "Guāng",
+            "definition": "light; bright, brilliant; only, merely",
+            "strokes": 6,
+            "radical": "儿",
+            "kangxi": 10,
+            "decomposition": "⿱⺌兀"
+          }
+        ],
+        "totalStrokes": 22
+      },
+      "node": {
+        "id": "sceau-haut",
+        "u": 0,
+        "v": 0.625
       },
       "portrait": "/img/characters/ningguang.webp"
     },
@@ -202,7 +500,33 @@
       },
       "culture": {
         "hanzi": "七七",
-        "pinyin": "Qī Qī"
+        "pinyin": "Qī Qī",
+        "chars": [
+          {
+            "char": "七",
+            "reading": "Qī",
+            "definition": "seven",
+            "strokes": 2,
+            "radical": "一",
+            "kangxi": 1,
+            "decomposition": "⿻一乚"
+          },
+          {
+            "char": "七",
+            "reading": "Qī",
+            "definition": "seven",
+            "strokes": 2,
+            "radical": "一",
+            "kangxi": 1,
+            "decomposition": "⿻一乚"
+          }
+        ],
+        "totalStrokes": 4
+      },
+      "node": {
+        "id": "socle",
+        "u": 0,
+        "v": -0.7188
       },
       "portrait": "/img/characters/qiqi.webp"
     },
@@ -221,7 +545,33 @@
       },
       "culture": {
         "hanzi": "申鹤",
-        "pinyin": "Shēn Hè"
+        "pinyin": "Shēn Hè",
+        "chars": [
+          {
+            "char": "申",
+            "reading": "Shēn",
+            "definition": "to report; to extend; to explain; to declare",
+            "strokes": 5,
+            "radical": "田",
+            "kangxi": 102,
+            "decomposition": "⿻日丨"
+          },
+          {
+            "char": "鹤",
+            "reading": "Hè",
+            "definition": "crane; Grus species (various)",
+            "strokes": 15,
+            "radical": "鸟",
+            "kangxi": 196,
+            "decomposition": "⿰隺鸟"
+          }
+        ],
+        "totalStrokes": 20
+      },
+      "node": {
+        "id": "g-angle",
+        "u": -0.7344,
+        "v": 0
       },
       "portrait": "/img/characters/shenhe.webp"
     },
@@ -240,7 +590,33 @@
       },
       "culture": {
         "hanzi": "香菱",
-        "pinyin": "Xiāng Líng"
+        "pinyin": "Xiāng Líng",
+        "chars": [
+          {
+            "char": "香",
+            "reading": "Xiāng",
+            "definition": "incense; fragrant, aromatic",
+            "strokes": 9,
+            "radical": "香",
+            "kangxi": 186,
+            "decomposition": "⿱禾日"
+          },
+          {
+            "char": "菱",
+            "reading": "Líng",
+            "definition": "water chestnut, water caltrop",
+            "strokes": 11,
+            "radical": "艹",
+            "kangxi": 140,
+            "decomposition": "⿱艹夌"
+          }
+        ],
+        "totalStrokes": 20
+      },
+      "node": {
+        "id": "g-gemme-ext",
+        "u": -0.6406,
+        "v": -0.1094
       },
       "portrait": "/img/characters/xiangling.webp"
     },
@@ -259,7 +635,33 @@
       },
       "culture": {
         "hanzi": "闲云",
-        "pinyin": "Xián Yún"
+        "pinyin": "Xián Yún",
+        "chars": [
+          {
+            "char": "闲",
+            "reading": "Xián",
+            "definition": "fence, guard; to defend; idle time",
+            "strokes": 7,
+            "radical": "门",
+            "kangxi": 169,
+            "decomposition": "⿵门木"
+          },
+          {
+            "char": "云",
+            "reading": "Yún",
+            "definition": "cloud; to say, to speak",
+            "strokes": 4,
+            "radical": "二",
+            "kangxi": 7,
+            "decomposition": "⿱二厶"
+          }
+        ],
+        "totalStrokes": 11
+      },
+      "node": {
+        "id": "g-toit",
+        "u": -0.25,
+        "v": 0.5
       },
       "portrait": "/img/characters/xianyun.webp"
     },
@@ -278,7 +680,24 @@
       },
       "culture": {
         "hanzi": "魈",
-        "pinyin": "Xiāo"
+        "pinyin": "Xiāo",
+        "chars": [
+          {
+            "char": "魈",
+            "reading": "Xiāo",
+            "definition": "mischievious mountain spirit",
+            "strokes": 16,
+            "radical": "鬼",
+            "kangxi": 194,
+            "decomposition": "⿺鬼肖"
+          }
+        ],
+        "totalStrokes": 16
+      },
+      "node": {
+        "id": "sommet",
+        "u": 0,
+        "v": 0.8594
       },
       "portrait": "/img/characters/xiao.webp"
     },
@@ -297,7 +716,33 @@
       },
       "culture": {
         "hanzi": "行秋",
-        "pinyin": "Xíng Qiū"
+        "pinyin": "Xíng Qiū",
+        "chars": [
+          {
+            "char": "行",
+            "reading": "Xíng",
+            "definition": "to go, to walk, to move; professional",
+            "strokes": 6,
+            "radical": "行",
+            "kangxi": 144,
+            "decomposition": "⿰彳亍"
+          },
+          {
+            "char": "秋",
+            "reading": "Qiū",
+            "definition": "autumn, fall; year",
+            "strokes": 9,
+            "radical": "禾",
+            "kangxi": 115,
+            "decomposition": "⿰禾火"
+          }
+        ],
+        "totalStrokes": 15
+      },
+      "node": {
+        "id": "d-angle",
+        "u": 0.7344,
+        "v": 0
       },
       "portrait": "/img/characters/xingqiu.webp"
     },
@@ -316,7 +761,33 @@
       },
       "culture": {
         "hanzi": "辛焱",
-        "pinyin": "Xīn Yàn"
+        "pinyin": "Xīn Yàn",
+        "chars": [
+          {
+            "char": "辛",
+            "reading": "Xīn",
+            "definition": "bitter; toilsome, laborious; 8th heavenly stem",
+            "strokes": 7,
+            "radical": "辛",
+            "kangxi": 160,
+            "decomposition": "⿱立十"
+          },
+          {
+            "char": "焱",
+            "reading": "Yàn",
+            "definition": "fierce flames; conflagration",
+            "strokes": 12,
+            "radical": "火",
+            "kangxi": 86,
+            "decomposition": "⿱火⿰火火"
+          }
+        ],
+        "totalStrokes": 19
+      },
+      "node": {
+        "id": "g-gemme-int",
+        "u": -0.2344,
+        "v": -0.1094
       },
       "portrait": "/img/characters/xinyan.webp"
     },
@@ -335,7 +806,33 @@
       },
       "culture": {
         "hanzi": "烟绯",
-        "pinyin": "Yān Fēi"
+        "pinyin": "Yān Fēi",
+        "chars": [
+          {
+            "char": "烟",
+            "reading": "Yān",
+            "definition": "smoke, soot; opium; tobacco, cigarettes",
+            "strokes": 10,
+            "radical": "火",
+            "kangxi": 86,
+            "decomposition": "⿰火因"
+          },
+          {
+            "char": "绯",
+            "reading": "Fēi",
+            "definition": "crimson, scarlet; purple",
+            "strokes": 11,
+            "radical": "纟",
+            "kangxi": 120,
+            "decomposition": "⿰纟非"
+          }
+        ],
+        "totalStrokes": 21
+      },
+      "node": {
+        "id": "d-gemme-int",
+        "u": 0.2344,
+        "v": -0.1094
       },
       "portrait": "/img/characters/yanfei.webp"
     },
@@ -354,7 +851,33 @@
       },
       "culture": {
         "hanzi": "瑶瑶",
-        "pinyin": "Yáo Yáo"
+        "pinyin": "Yáo Yáo",
+        "chars": [
+          {
+            "char": "瑶",
+            "reading": "Yáo",
+            "definition": "precious jade",
+            "strokes": 14,
+            "radical": "王",
+            "kangxi": 96,
+            "decomposition": "⿰王䍃"
+          },
+          {
+            "char": "瑶",
+            "reading": "Yáo",
+            "definition": "precious jade",
+            "strokes": 14,
+            "radical": "王",
+            "kangxi": 96,
+            "decomposition": "⿰王䍃"
+          }
+        ],
+        "totalStrokes": 28
+      },
+      "node": {
+        "id": "g-attache",
+        "u": -0.4375,
+        "v": 0.1719
       },
       "portrait": "/img/characters/yaoyao.webp"
     },
@@ -373,7 +896,33 @@
       },
       "culture": {
         "hanzi": "夜兰",
-        "pinyin": "Yè Lán"
+        "pinyin": "Yè Lán",
+        "chars": [
+          {
+            "char": "夜",
+            "reading": "Yè",
+            "definition": "night, dark; under cover of night",
+            "strokes": 8,
+            "radical": "夕",
+            "kangxi": 36,
+            "decomposition": "⿱亠⿰亻夕"
+          },
+          {
+            "char": "兰",
+            "reading": "Lán",
+            "definition": "orchid; elegant, graceful",
+            "strokes": 5,
+            "radical": "丷",
+            "kangxi": 12,
+            "decomposition": "⿱丷三"
+          }
+        ],
+        "totalStrokes": 13
+      },
+      "node": {
+        "id": "d-toit",
+        "u": 0.25,
+        "v": 0.5
       },
       "portrait": "/img/characters/yelan.webp"
     },
@@ -392,7 +941,33 @@
       },
       "culture": {
         "hanzi": "云堇",
-        "pinyin": "Yún Jǐn"
+        "pinyin": "Yún Jǐn",
+        "chars": [
+          {
+            "char": "云",
+            "reading": "Yún",
+            "definition": "cloud; to say, to speak",
+            "strokes": 4,
+            "radical": "二",
+            "kangxi": 7,
+            "decomposition": "⿱二厶"
+          },
+          {
+            "char": "堇",
+            "reading": "Jǐn",
+            "definition": "yellow loam; clay; season; few",
+            "strokes": 11,
+            "radical": "土",
+            "kangxi": 32,
+            "decomposition": "⿱黄土"
+          }
+        ],
+        "totalStrokes": 15
+      },
+      "node": {
+        "id": "g-plateau",
+        "u": -0.7344,
+        "v": -0.3906
       },
       "portrait": "/img/characters/yun-jin.webp"
     },
@@ -411,7 +986,33 @@
       },
       "culture": {
         "hanzi": "钟离",
-        "pinyin": "Zhōng Lí"
+        "pinyin": "Zhōng Lí",
+        "chars": [
+          {
+            "char": "钟",
+            "reading": "Zhōng",
+            "definition": "clock; bell",
+            "strokes": 9,
+            "radical": "钅",
+            "kangxi": 167,
+            "decomposition": "⿰钅中"
+          },
+          {
+            "char": "离",
+            "reading": "Lí",
+            "definition": "rare beast; strange; elegant",
+            "strokes": 10,
+            "radical": "禸",
+            "kangxi": 114,
+            "decomposition": "⿱⿱亠凶禸"
+          }
+        ],
+        "totalStrokes": 19
+      },
+      "node": {
+        "id": "sceau-coeur",
+        "u": 0,
+        "v": 0.375
       },
       "portrait": "/img/characters/zhongli.webp"
     }

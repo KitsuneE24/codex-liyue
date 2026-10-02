@@ -1,0 +1,53 @@
+{
+  "_note": "Ancrages mesurés en pixels sur liyue-emblem.webp (256 × 256, y vers le bas). Le script les convertit en u, v ∈ [-1, 1]. Côté droit = miroir du gauche (x → 256 - x).",
+  "size": 256,
+  "nodes": [
+    { "id": "sommet",        "x": 128, "y": 18,  "character": "xiao" },
+    { "id": "sceau-haut",    "x": 128, "y": 48,  "character": "ningguang" },
+    { "id": "sceau-coeur",   "x": 128, "y": 80,  "character": "zhongli" },
+    { "id": "pilier-haut",   "x": 128, "y": 116, "character": "keqing" },
+    { "id": "pilier-losange","x": 128, "y": 184, "character": "hu-tao" },
+    { "id": "socle",         "x": 128, "y": 220, "character": "qiqi" },
+
+    { "id": "g-toit",        "x": 96,  "y": 64,  "character": "xianyun" },
+    { "id": "g-fleau",       "x": 40,  "y": 76,  "character": "ganyu" },
+    { "id": "g-angle",       "x": 34,  "y": 128, "character": "shenhe" },
+    { "id": "g-attache",     "x": 72,  "y": 106, "character": "yaoyao" },
+    { "id": "g-gemme-ext",   "x": 46,  "y": 142, "character": "xiangling" },
+    { "id": "g-gemme-int",   "x": 98,  "y": 142, "character": "xinyan" },
+    { "id": "g-plateau",     "x": 34,  "y": 178, "character": "yun-jin" },
+
+    { "id": "d-toit",        "x": 160, "y": 64,  "character": "yelan" },
+    { "id": "d-fleau",       "x": 216, "y": 76,  "character": "beidou" },
+    { "id": "d-angle",       "x": 222, "y": 128, "character": "xingqiu" },
+    { "id": "d-attache",     "x": 184, "y": 106, "character": "chongyun" },
+    { "id": "d-gemme-ext",   "x": 210, "y": 142, "character": "gaming" },
+    { "id": "d-gemme-int",   "x": 158, "y": 142, "character": "yanfei" },
+    { "id": "d-plateau",     "x": 222, "y": 178, "character": "baizhu" }
+  ],
+  "edges": [
+    ["sommet", "sceau-haut"],
+    ["sceau-haut", "sceau-coeur"],
+    ["sceau-coeur", "pilier-haut"],
+    ["pilier-haut", "pilier-losange"],
+    ["pilier-losange", "socle"],
+
+    ["sceau-haut", "g-toit"],
+    ["g-toit", "g-angle"],
+    ["g-angle", "g-plateau"],
+    ["sceau-coeur", "g-fleau"],
+    ["g-fleau", "g-attache"],
+    ["g-attache", "g-gemme-ext"],
+    ["g-attache", "g-gemme-int"],
+    ["g-gemme-ext", "g-gemme-int"],
+
+    ["sceau-haut", "d-toit"],
+    ["d-toit", "d-angle"],
+    ["d-angle", "d-plateau"],
+    ["sceau-coeur", "d-fleau"],
+    ["d-fleau", "d-attache"],
+    ["d-attache", "d-gemme-ext"],
+    ["d-attache", "d-gemme-int"],
+    ["d-gemme-ext", "d-gemme-int"]
+  ]
+}

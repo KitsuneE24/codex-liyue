@@ -38,7 +38,84 @@ async function download(path, dest) {
   await writeFile(dest, Buffer.from(await r.arrayBuffer()))
 }
 
+// Nombre de traits d'un caractère : longueur du tableau `strokes` de
+// hanzi-writer-data (données Make Me a Hanzi, un tracé par trait).
+const HANZI_DATA = 'https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0'
+const strokeCache = new Map()
+async function strokesOf(char) {
+  if (!strokeCache.has(char)) {
+    const r = await fetch(`${HANZI_DATA}/${encodeURIComponent(char)}.json`)
+    if (!r.ok) throw new Error(`traits de ${char} → HTTP ${r.status}`)
+    strokeCache.set(char, (await r.json()).strokes.length)
+  }
+  return strokeCache.get(char)
+}
+
+const MMAH = 'https://cdn.jsdelivr.net/gh/skishore/makemeahanzi@master/dictionary.txt'
+const dictionary = new Map(
+  (await (await fetch(MMAH)).text())
+    .split('\n')
+    .filter(Boolean)
+    .map((line) => JSON.parse(line))
+    .map((e) => [e.character, e]),
+)
+
+// Formes simplifiées des clés, absentes du bloc Unicode des 214 clés Kangxi.
+// Vérifié contre Unihan (kRSUnicode).
+const KANGXI_SIMPLIFIED = {
+  '丷': 12, '刂': 18, '王': 96, '纟': 120, '⺼': 130,
+  '艹': 140, '钅': 167, '门': 169, '鸟': 196,
+}
+const KANGXI = new Map(
+  Array.from({ length: 214 }, (_, i) => [String.fromCodePoint(0x2f00 + i).normalize('NFKC'), i + 1]),
+)
+const kangxiOf = (radical) => {
+  const n = KANGXI.get(radical) ?? KANGXI_SIMPLIFIED[radical]
+  if (!n) throw new Error(`Clé sans numéro Kangxi : ${radical}`)
+  return n
+}
+
+async function cultureOf(entry) {
+  const readings = entry.pinyin.split(' ')
+  const hanzi = [...entry.hanzi]
+  if (readings.length !== hanzi.length) {
+    throw new Error(`${entry.hanzi} : ${hanzi.length} caractères pour ${readings.length} syllabes`)
+  }
+  const chars = []
+  for (const [i, char] of hanzi.entries()) {
+    const d = dictionary.get(char)
+    if (!d) throw new Error(`${char} absent de Make Me a Hanzi`)
+    chars.push({
+      char,
+      reading: readings[i],
+      definition: d.definition,
+      strokes: await strokesOf(char),
+      radical: d.radical,
+      kangxi: kangxiOf(d.radical),
+      decomposition: d.decomposition,
+    })
+  }
+  return {
+    ...entry,
+    chars,
+    totalStrokes: chars.reduce((s, c) => s + c.strokes, 0),
+  }
+}
+
 const culture = JSON.parse(await readFile(new URL('scripts/culture.json', ROOT), 'utf8'))
+const layout = JSON.parse(await readFile(new URL('scripts/layout.json', ROOT), 'utf8'))
+
+// Pixels du blason → repère u, v ∈ [-1, 1], v vers le haut.
+const half = layout.size / 2
+const nodeOf = new Map(
+  layout.nodes.map((n) => [
+    n.character,
+    { id: n.id, u: +((n.x - half) / half).toFixed(4), v: +((half - n.y) / half).toFixed(4) },
+  ]),
+)
+const nodeIds = new Set(layout.nodes.map((n) => n.id))
+const badEdges = layout.edges.filter(([a, b]) => !nodeIds.has(a) || !nodeIds.has(b))
+if (badEdges.length) throw new Error(`Arêtes vers un nœud inconnu : ${JSON.stringify(badEdges)}`)
 
 // /characters/all ne renvoie pas l'identifiant : on le reprend de /characters.
 const ids = await getJson('/characters')
@@ -57,6 +134,10 @@ if (mismatch.length) {
 const missing = liyue.filter((c) => !culture[c.id]).map((c) => c.id)
 if (missing.length) {
   throw new Error(`Absents de culture.json : ${missing.join(', ')}`)
+}
+const unplaced = liyue.filter((c) => !nodeOf.has(c.id)).map((c) => c.id)
+if (unplaced.length) {
+  throw new Error(`Sans ancrage dans layout.json : ${unplaced.join(', ')}`)
 }
 
 await mkdir(CHAR_DIR, { recursive: true })
@@ -78,7 +159,8 @@ for (const c of liyue) {
       constellation: c.constellation,
       description: c.description,
     },
-    culture: culture[c.id],
+    culture: await cultureOf(culture[c.id]),
+    node: nodeOf.get(c.id),
     portrait: `/img/characters/${c.id}.webp`,
   })
   process.stdout.write('.')
@@ -87,10 +169,13 @@ for (const c of liyue) {
 const doc = {
   meta: {
     source: `${API} (github.com/genshindev/api)`,
+    strokes: `${HANZI_DATA} (Make Me a Hanzi)`,
+    characters: `${MMAH} (Make Me a Hanzi : sens, clé, décomposition)`,
     builtAt: new Date().toISOString(),
     count: characters.length,
   },
   elements: ELEMENTS,
+  constellation: { edges: layout.edges },
   characters,
 }
 

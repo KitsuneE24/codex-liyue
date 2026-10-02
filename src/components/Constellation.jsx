@@ -3,7 +3,7 @@ import ConstellationScene from '../three/ConstellationScene.js'
 import Carousel from './Carousel.jsx'
 import { VUES } from '../data/views.js'
 
-export default function Constellation({ doc, selectedId, onSelect }) {
+export default function Constellation({ doc, selectedId, onSelect, predicate }) {
   const hostRef = useRef(null)
   const sceneRef = useRef(null)
   const [courante, setCourante] = useState(VUES[1])
@@ -26,8 +26,12 @@ export default function Constellation({ doc, selectedId, onSelect }) {
     sceneRef.current?.setSelected(selectedId)
   }, [selectedId, doc, onSelect])
 
+  useEffect(() => {
+    sceneRef.current?.setFilter(predicate)
+  }, [predicate, doc, onSelect])
+
   return (
-    <>
+    <div className="stage">
       <div className="constellation" ref={hostRef} />
       {courante.titre && (
         <h2 key={courante.cle} className="vue-titre">{courante.titre}</h2>
@@ -38,6 +42,6 @@ export default function Constellation({ doc, selectedId, onSelect }) {
           onGo={(v) => sceneRef.current?.goTo(v.deg)}
         />
       )}
-    </>
+    </div>
   )
 }

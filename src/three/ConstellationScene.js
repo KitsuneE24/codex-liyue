@@ -140,6 +140,10 @@ export default class ConstellationScene {
     this.chronoSide = false
     this.place(this.zTraits)
     this.vue = null
+    this.sideExt = {
+      chrono: this._sideExtent(this.zDate, 1),
+      traits: this._sideExtent(this.zTraits, -1),
+    }
 
     this.raycaster = new THREE.Raycaster()
     this.pointer = new THREE.Vector2(-2, -2) // hors écran au départ
@@ -316,10 +320,12 @@ export default class ConstellationScene {
         size: 1,
         grow: 0,
         shine: 0,
+        on: 1,
         baseColor,
       })
     })
     this.byId = new Map(this.items.map((it) => [it.data.id, it]))
+    this.active = new Set(this.byId.keys())
   }
 
   _buildLabel() {
@@ -351,7 +357,15 @@ export default class ConstellationScene {
   _pick() {
     this.raycaster.setFromCamera(this.pointer, this.camera)
     const hits = this.raycaster.intersectObjects(this.pickables, false)
-    return hits.length ? hits[0].object.userData.id : null
+    const hit = hits.find((h) => this.active.has(h.object.userData.id))
+    return hit ? hit.object.userData.id : null
+  }
+
+  setFilter(predicate) {
+    this.active = new Set(
+      this.items.filter((it) => predicate(it.data)).map((it) => it.data.id),
+    )
+    if (this.hovered && !this.active.has(this.hovered.data.id)) this._setHovered(null)
   }
 
   _setHovered(id) {
@@ -502,26 +516,57 @@ export default class ConstellationScene {
     return byAnchor
   }
 
+  // Emprise d'une vue de profil, en tangentes vues depuis la caméra
+  // (s = 1 : caméra à gauche, côté chronologie ; s = -1 : à droite).
+  _sideExtent(zOf, s) {
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity
+    const add = (lat, y, depth, m = 0) => {
+      x0 = Math.min(x0, (lat - m) / depth)
+      x1 = Math.max(x1, (lat + m) / depth)
+      y0 = Math.min(y0, (y - m) / depth)
+      y1 = Math.max(y1, (y + m) / depth)
+    }
+    this.items.forEach((it) => {
+      const z = zOf(it.data)
+      const p = this._worldPos(it.data.node.u, it.data.node.v, z)
+      add(s * p.z, p.y, CAM_D + s * p.x, 0.35 * it.base)
+    })
+    add(s * (Z_FAR - 0.6), AXIS_Y - 1.0, CAM_D)
+    add(s * (Z_NEAR + 0.6), AXIS_Y - 1.0, CAM_D)
+    return { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, hx: (x1 - x0) / 2, hy: (y1 - y0) / 2 }
+  }
+
   _onResize() {
     const w = this.container.clientWidth
     const h = this.container.clientHeight
     if (!w || !h) return
     this.camera.aspect = w / h
+    this.size = { w, h }
 
     // On ouvre l'angle de champ au lieu de reculer : l'anamorphose suppose CAM_D.
     const a = this.camera.aspect
     const need = (v, h) => 1.06 * Math.max(v, h / a)
     const dEmblem = CAM_D - Z_EMBLEM
     this.tanFront = need(0.86 * EMBLEM / dEmblem, 0.76 * EMBLEM / dEmblem)
-    this.tanSide = need((1.0 - AXIS_Y) / CAM_D, (Math.max(-Z_FAR, Z_NEAR) + 0.6) / CAM_D)
-    this._setFov(this.face ?? 1)
+    this.tanSide = {
+      chrono: need(this.sideExt.chrono.hy, this.sideExt.chrono.hx),
+      traits: need(this.sideExt.traits.hy, this.sideExt.traits.hx),
+    }
     this.renderer.setSize(w, h)
+    this._setFov(this.face ?? 1, this.chronoSide)
   }
 
-  _setFov(face) {
-    const tan = this.tanSide + (this.tanFront - this.tanSide) * face
+  // De profil, on décentre l'image (setViewOffset) pour centrer le graphique
+  // sans déplacer la caméra.
+  _setFov(face, chronoSide) {
+    const side = chronoSide ? 'chrono' : 'traits'
+    const ext = this.sideExt[side]
+    const tan = this.tanSide[side] + (this.tanFront - this.tanSide[side]) * face
     this.camera.fov = 2 * Math.atan(tan) / DEG
-    this.camera.updateProjectionMatrix()
+    const { w, h } = this.size
+    const ox = ((ext.cx * (1 - face)) / (tan * this.camera.aspect)) * (w / 2)
+    const oy = ((-ext.cy * (1 - face)) / tan) * (h / 2)
+    this.camera.setViewOffset(w, h, ox, oy, w, h)
   }
 
   _animate(time) {
@@ -543,7 +588,8 @@ export default class ConstellationScene {
     this.items.forEach((it) => {
       const m = it.sprite.material
       it.shine += ((it === this.selected ? 1 : 0) - it.shine) * k
-      m.opacity = Math.max(it.shine, 1 - 0.7 * this.focusLevel)
+      it.on += ((this.active.has(it.data.id) ? 1 : 0.12) - it.on) * k
+      m.opacity = it.on * Math.max(it.shine, 1 - 0.7 * this.focusLevel)
       m.color.copy(it.baseColor).multiplyScalar(1 + 1.2 * it.shine)
       const goal = it === this.selected ? 1 : it === this.hovered ? 0.35 : 0
       if (Math.abs(goal - it.grow) < 1e-4) return
@@ -567,7 +613,8 @@ export default class ConstellationScene {
     // produit pile à 0°, où les deux répartitions donnent la même image
     // projetée : elle est donc invisible.
     const chronoSide = az < 0
-    if (chronoSide !== this.chronoSide) {
+    const sideChanged = chronoSide !== this.chronoSide
+    if (sideChanged) {
       this.chronoSide = chronoSide
       this.place(chronoSide ? this.zDate : this.zTraits)
     }
@@ -575,9 +622,9 @@ export default class ConstellationScene {
     // Fondu croisé piloté par l'angle : de face le blason, de profil l'axe.
     const t = Math.min(1, Math.abs(az) / (Math.PI / 2))
     const face = Math.pow(Math.cos(t * Math.PI / 2), 1.4)
-    if (face !== this.face) {
+    if (face !== this.face || sideChanged) {
       this.face = face
-      this._setFov(face)
+      this._setFov(face, chronoSide)
     }
     this.emblem.material.opacity = this.emblemLevel * face
     this.lineMat.opacity = 0.85 * face * (1 - 0.6 * this.focusLevel)

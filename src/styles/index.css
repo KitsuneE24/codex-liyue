@@ -8,6 +8,118 @@ body {
 
 .status { padding: 1.5rem; }
 
+:root { --panel: 300px; }
+
+.stage { position: absolute; inset: 0 0 0 var(--panel); }
+
+.panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--panel);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px 16px;
+  border-right: 1px solid rgba(232, 192, 125, 0.18);
+  background: #0b0a0f;
+}
+
+.panel__title {
+  margin: 0 0 16px;
+  padding: 0 4px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #b9ad97;
+}
+
+.panel__title span {
+  display: block;
+  font-size: 28px;
+  font-weight: 700;
+  color: #e8c07d;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 0 4px 14px;
+  border-bottom: 1px solid rgba(232, 192, 125, 0.15);
+}
+
+.filters__field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #8f846f; }
+.filters__field--wide { grid-column: 1 / -1; }
+
+.filters input,
+.filters select {
+  padding: 7px 9px;
+  border: 1px solid rgba(232, 192, 125, 0.3);
+  border-radius: 8px;
+  background: #15121a;
+  color: #e8e2d4;
+  font: inherit;
+  font-size: 14px;
+}
+
+.filters input:focus-visible,
+.filters select:focus-visible { outline: 2px solid #e8c07d; outline-offset: 1px; }
+
+.filters__count {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: #8f846f;
+}
+
+.filters__reset {
+  border: 0;
+  background: none;
+  color: #e8c07d;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.index { flex: 1; overflow-y: auto; margin-top: 8px; }
+.index ul { list-style: none; margin: 0; padding: 0; }
+.index__empty { margin: 16px 4px; font-size: 14px; color: #8f846f; }
+
+.index__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: none;
+  color: #e8e2d4;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.index__item:hover,
+.index__item:focus-visible { background: rgba(232, 192, 125, 0.08); outline: none; border-color: rgba(232, 192, 125, 0.4); }
+.index__item[aria-current='true'] { background: rgba(232, 192, 125, 0.14); border-color: #e8c07d; }
+
+.index__img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #15121a;
+  object-fit: cover;
+}
+
+.index__hanzi { color: #e8c07d; font-size: 17px; min-width: 2.2em; }
+.index__name { flex: 1; font-size: 14px; }
+.index__dot { width: 8px; height: 8px; border-radius: 50%; }
+
 .constellation { position: absolute; inset: 0; }
 .constellation canvas { display: block; width: 100%; height: 100%; }
 
@@ -261,3 +373,73 @@ body {
 }
 
 .seal__hit:focus-visible { outline: 2px solid #e8c07d; outline-offset: 2px; }
+
+.panel-toggle {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 3;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(232, 192, 125, 0.45);
+  border-radius: 12px;
+  background: rgba(7, 6, 10, 0.8);
+  color: #e8c07d;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.panel-toggle:focus-visible { outline: 2px solid #e8c07d; outline-offset: 2px; }
+
+.panel-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+@media (max-width: 760px) {
+  :root { --panel: 0px; }
+
+  .panel {
+    z-index: 2;
+    width: min(320px, 88vw);
+    padding-top: 68px;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+  }
+
+  .panel.is-open { transform: none; }
+
+  .vue-titre { top: 22px; font-size: 18px; }
+
+  .carousel__btn {
+    top: auto;
+    bottom: 16px;
+    transform: none;
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+
+  .carousel__btn--gauche { left: 12px; }
+  .carousel__btn--droite { right: 12px; }
+
+  .sheet {
+    top: auto;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: auto;
+    height: 86%;
+    animation-name: sheet-up;
+  }
+
+  .sheet__scroll { padding: 48px 18px 108px; }
+  .sheet__portrait { width: 72px; height: 72px; }
+  .sheet__name { font-size: 22px; }
+}
+
+@keyframes sheet-up {
+  from { opacity: 0; transform: translateY(40px); }
+}

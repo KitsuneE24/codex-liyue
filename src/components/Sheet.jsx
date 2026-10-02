@@ -1,13 +1,6 @@
 import { useEffect, useState } from 'react'
 import Seal from './Seal.jsx'
-
-const ARMES = {
-  Sword: 'Épée à une main',
-  Claymore: 'Épée à deux mains',
-  Polearm: "Arme d'hast",
-  Bow: 'Arc',
-  Catalyst: 'Catalyseur',
-}
+import { ARMES } from '../data/labels.js'
 
 const IDS = /[⿰-⿻？?]/gu
 

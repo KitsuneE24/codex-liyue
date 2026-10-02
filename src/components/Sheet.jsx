@@ -109,6 +109,15 @@ function CultureSide({ c }) {
   )
 }
 
+function CloseButton({ onClose }) {
+  return (
+    <button type="button" className="sheet__close" onClick={onClose}>
+      <span aria-hidden="true">×</span>
+      <span className="sr-only">Fermer la fiche</span>
+    </button>
+  )
+}
+
 export default function Sheet({ character, element, onClose }) {
   const [flipped, setFlipped] = useState(false)
 
@@ -126,20 +135,21 @@ export default function Sheet({ character, element, onClose }) {
       <div className="sheet__lift">
         <div className="sheet__flip">
           <section className="sheet__side sheet__side--front" inert={flipped}>
-            <GameSide c={character} element={element} />
+            <div className="sheet__scroll">
+              <GameSide c={character} element={element} />
+            </div>
+            <CloseButton onClose={onClose} />
           </section>
           <section className="sheet__side sheet__side--back" inert={!flipped}>
-            <CultureSide c={character} />
+            <div className="sheet__scroll">
+              <CultureSide c={character} />
+            </div>
+            <CloseButton onClose={onClose} />
           </section>
         </div>
       </div>
 
       <Seal flipped={flipped} onToggle={() => setFlipped((f) => !f)} />
-
-      <button type="button" className="sheet__close" onClick={onClose}>
-        <span aria-hidden="true">×</span>
-        <span className="sr-only">Fermer la fiche</span>
-      </button>
     </aside>
   )
 }

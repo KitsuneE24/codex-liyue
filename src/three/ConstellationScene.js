@@ -53,27 +53,19 @@ function starTexture() {
   return tex
 }
 
-function ringTexture() {
+function glowTexture() {
   const s = 256
   const cv = document.createElement('canvas')
   cv.width = cv.height = s
   const ctx = cv.getContext('2d')
   const c = s / 2
-  ctx.strokeStyle = '#fff'
-  ctx.shadowColor = '#fff'
-  ctx.shadowBlur = 12
-  ctx.lineWidth = 5
-  ctx.beginPath()
-  ctx.arc(c, c, 96, 0, Math.PI * 2)
-  ctx.stroke()
-  ctx.lineWidth = 8
-  for (let i = 0; i < 4; i++) {
-    const a = (i * Math.PI) / 2
-    ctx.beginPath()
-    ctx.moveTo(c + Math.cos(a) * 104, c + Math.sin(a) * 104)
-    ctx.lineTo(c + Math.cos(a) * 120, c + Math.sin(a) * 120)
-    ctx.stroke()
-  }
+  const g = ctx.createRadialGradient(c, c, 0, c, c, c)
+  g.addColorStop(0, 'rgba(255,255,255,.9)')
+  g.addColorStop(0.15, 'rgba(255,255,255,.45)')
+  g.addColorStop(0.5, 'rgba(255,255,255,.08)')
+  g.addColorStop(1, 'rgba(255,255,255,0)')
+  ctx.fillStyle = g
+  ctx.fillRect(0, 0, s, s)
   const tex = new THREE.CanvasTexture(cv)
   tex.colorSpace = THREE.SRGBColorSpace
   return tex
@@ -139,7 +131,7 @@ export default class ConstellationScene {
     this._buildEmblem()
     this._buildStars()
     this._buildEdges()
-    this._buildRing()
+    this._buildGlow()
     this.axeChrono = this._buildAxis(this.chronoTicks)
     this.axeTraits = this._buildAxis(this.traitsTicks)
 
@@ -305,6 +297,7 @@ export default class ConstellationScene {
         toneMapped: false,
         color: new THREE.Color(0xffffff).lerp(color, 0.45),
       })
+      const baseColor = mat.color.clone()
       const sprite = new THREE.Sprite(mat)
       this.group.add(sprite)
 
@@ -322,6 +315,8 @@ export default class ConstellationScene {
         base: c.game.rarity === 5 ? 1.6 : 1.15, // la taille encode la rareté
         size: 1,
         grow: 0,
+        shine: 0,
+        baseColor,
       })
     })
     this.byId = new Map(this.items.map((it) => [it.data.id, it]))
@@ -330,12 +325,19 @@ export default class ConstellationScene {
   _buildLabel() {
     this.label = document.createElement('div')
     this.label.className = 'star-label'
+    this.labelImg = document.createElement('img')
+    this.labelImg.className = 'star-label__img'
+    this.labelImg.alt = ''
     this.labelHanzi = document.createElement('span')
     this.labelHanzi.className = 'star-label__hanzi'
     this.labelName = document.createElement('span')
     this.labelName.className = 'star-label__name'
-    this.label.append(this.labelHanzi, this.labelName)
+    const text = document.createElement('div')
+    text.className = 'star-label__text'
+    text.append(this.labelHanzi, this.labelName)
+    this.label.append(this.labelImg, text)
     this.container.appendChild(this.label)
+    this.doc.characters.forEach((c) => { new Image().src = c.portrait })
   }
 
   _setPointer(e) {
@@ -361,6 +363,7 @@ export default class ConstellationScene {
     if (it) {
       this.labelHanzi.textContent = it.data.culture.hanzi
       this.labelName.textContent = it.data.game.name
+      this.labelImg.src = it.data.portrait
     }
   }
 
@@ -454,19 +457,19 @@ export default class ConstellationScene {
     return new THREE.Vector3(u * EMBLEM * k, v * EMBLEM * k, z)
   }
 
-  _buildRing() {
-    this.ringTex = ringTexture()
-    this.ring = new THREE.Sprite(new THREE.SpriteMaterial({
-      map: this.ringTex,
+  _buildGlow() {
+    this.glowTex = glowTexture()
+    this.glow = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: this.glowTex,
       transparent: true,
       opacity: 0,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
       toneMapped: false,
     }))
-    this.ring.visible = false
-    this.group.add(this.ring)
-    this.ringItem = null
+    this.glow.visible = false
+    this.group.add(this.glow)
+    this.glowItem = null
     this.focusLevel = 0
   }
 
@@ -535,25 +538,27 @@ export default class ConstellationScene {
     this.controls.update()
 
     this.focusLevel += ((this.selected ? 1 : 0) - this.focusLevel) * k
-    if (this.selected) this.ringItem = this.selected
+    if (this.selected) this.glowItem = this.selected
 
     this.items.forEach((it) => {
-      it.sprite.material.opacity = it === this.selected ? 1 : 1 - 0.7 * this.focusLevel
+      const m = it.sprite.material
+      it.shine += ((it === this.selected ? 1 : 0) - it.shine) * k
+      m.opacity = Math.max(it.shine, 1 - 0.7 * this.focusLevel)
+      m.color.copy(it.baseColor).multiplyScalar(1 + 1.2 * it.shine)
       const goal = it === this.selected ? 1 : it === this.hovered ? 0.35 : 0
       if (Math.abs(goal - it.grow) < 1e-4) return
       it.grow += (goal - it.grow) * k
       it.sprite.scale.setScalar(it.size * (1 + 0.6 * it.grow))
     })
 
-    const ri = this.ringItem
-    this.ring.visible = !!ri && this.focusLevel > 0.01
-    if (this.ring.visible) {
-      const m = this.ring.material
-      m.color.set(this.doc.elements[ri.data.game.vision].color)
-      m.opacity = this.focusLevel
-      m.rotation += dt * 0.4
-      this.ring.position.copy(ri.sprite.position)
-      this.ring.scale.setScalar(ri.size * (1.1 + 0.05 * Math.sin(time / 400)))
+    const gi = this.glowItem
+    this.glow.visible = !!gi && gi.shine > 0.01
+    if (this.glow.visible) {
+      const m = this.glow.material
+      m.color.set(this.doc.elements[gi.data.game.vision].color)
+      m.opacity = 0.85 * gi.shine
+      this.glow.position.copy(gi.sprite.position)
+      this.glow.scale.setScalar(gi.size * (1.5 + 0.08 * Math.sin(time / 500)))
     }
 
     const az = this.controls.getAzimuthalAngle()
@@ -625,8 +630,8 @@ export default class ConstellationScene {
     this.emblem.material.dispose()
     this.items.forEach((it) => it.sprite.material.dispose())
     this.starTex.dispose()
-    this.ringTex.dispose()
-    this.ring.material.dispose()
+    this.glowTex.dispose()
+    this.glow.material.dispose()
     this.lineGeo.dispose()
     this.lineMat.dispose()
 

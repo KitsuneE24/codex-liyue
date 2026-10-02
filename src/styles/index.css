@@ -16,10 +16,10 @@ body {
   top: 0;
   left: 0;
   display: flex;
-  align-items: baseline;
-  gap: 8px;
-  padding: 4px 10px;
-  border-radius: 6px;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 6px;
+  border-radius: 999px;
   background: rgba(7, 6, 10, 0.75);
   border: 1px solid rgba(232, 192, 125, 0.35);
   color: #e8e2d4;
@@ -30,6 +30,16 @@ body {
 }
 
 .star-label.is-visible { opacity: 1; }
+.star-label__img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(232, 192, 125, 0.4);
+  background: #0d0b10;
+  object-fit: cover;
+}
+
+.star-label__text { display: flex; flex-direction: column; line-height: 1.2; }
 .star-label__hanzi { color: #e8c07d; font-size: 20px; }
 .star-label__name { font-size: 14px; }
 
@@ -134,10 +144,8 @@ body {
 .sheet__side {
   position: absolute;
   inset: 0;
-  overflow-y: auto;
+  overflow: hidden;
   backface-visibility: hidden; /* on ne voit pas le dos */
-  box-sizing: border-box;
-  padding: 52px 24px 24px;
   border-radius: 16px;
   border: 1px solid rgba(232, 192, 125, 0.3);
   background: linear-gradient(160deg, #17131c, #0d0b10);
@@ -149,11 +157,18 @@ body {
   background: linear-gradient(160deg, #1d1410, #0e0a08);
 }
 
+.sheet__scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 52px 24px 112px;
+}
+
 .sheet__head {
   display: flex;
   gap: 16px;
   align-items: center;
-  padding-right: 72px;
 }
 
 .sheet__portrait {
@@ -191,7 +206,6 @@ body {
 
 .sheet__desc { margin: 20px 0 0; font-size: 14px; line-height: 1.55; color: #c9bfae; }
 
-.sheet__culture-head { padding-right: 72px; }
 .sheet__big { margin: 0; font-size: 56px; line-height: 1.1; color: #e8c07d; }
 .sheet__pinyin { margin: 4px 0 0; color: #b9ad97; }
 
@@ -211,7 +225,7 @@ body {
 .sheet__close {
   position: absolute;
   top: 10px;
-  left: 10px;
+  right: 10px;
   width: 32px;
   height: 32px;
   border: 0;
@@ -227,8 +241,9 @@ body {
 
 .seal {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 76px;
   height: 76px;
 }

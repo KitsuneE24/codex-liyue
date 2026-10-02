@@ -6,11 +6,15 @@ import { vueProche } from '../data/views.js'
 // Les ancrages des personnages sont donnés dans son repère (u, v ∈ [-1, 1]).
 const EMBLEM = 7.4 // demi-taille du plan du blason
 const Z_EMBLEM = -7.0 // le blason, écran de projection, tout au fond
-const Z_NEAR = 4.0 // profondeur de la valeur la plus haute
+const Z_NEAR = 7.0 // profondeur de la valeur la plus haute
 const Z_FAR = -6.0 // profondeur de la valeur la plus basse
 const CAM_D = 17.0 // distance de la caméra à l'origine
 const AXIS_Y = -6.2 // hauteur des axes gradués, sous la figure
 const FOCUS_D = 10 // distance de la caméra à l'étoile sélectionnée
+const SHEET_PX = 448 // largeur de la fiche et de ses marges (index.css)
+const OMEGA = 5 // raideur du ressort de sélection
+const TITLE_PX = 72 // bande du titre de vue, en pixels
+const D_SIDE = 400 // de profil, la caméra recule pour aplatir la perspective
 const DEG = Math.PI / 180
 const ORIGIN = new THREE.Vector3()
 
@@ -90,6 +94,18 @@ function labelTexture(text) {
   return { tex, aspect: cv.width / cv.height }
 }
 
+// Ressort amorti critique : part à vitesse nulle, arrive sans rebond.
+function spring(s, goal, dt) {
+  s.v += (OMEGA * OMEGA * (goal - s.x) - 2 * OMEGA * s.v) * dt
+  s.x += s.v * dt
+}
+
+function springVec(s, goal, dt) {
+  const a = goal.clone().sub(s.x).multiplyScalar(OMEGA * OMEGA).addScaledVector(s.v, -2 * OMEGA)
+  s.v.addScaledVector(a, dt)
+  s.x.addScaledVector(s.v, dt)
+}
+
 const easeInOutCubic = (t) =>
   t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
 
@@ -109,7 +125,7 @@ export default class ConstellationScene {
 
     // Caméra strictement axiale au repos : la correction anamorphique
     // suppose une caméra sur l'axe Z, visant l'origine.
-    this.camera = new THREE.PerspectiveCamera(46, 1, 0.1, 200)
+    this.camera = new THREE.PerspectiveCamera(46, 1, 0.1, 1000)
     this.camera.position.set(0, 0, CAM_D)
     this.camera.lookAt(0, 0, 0)
 
@@ -119,6 +135,11 @@ export default class ConstellationScene {
     this.controls.minAzimuthAngle = -90 * DEG
     this.controls.maxAzimuthAngle = 90 * DEG
     this.controls.enablePan = false
+    this.controls.enableZoom = false
+    this.baseRadius = CAM_D
+    this.tgt = { x: new THREE.Vector3(), v: new THREE.Vector3() }
+    this.rad = { x: CAM_D, v: 0 }
+    this.sel = { x: 0, v: 0 }
     this.controls.minPolarAngle = Math.PI / 2
     this.controls.maxPolarAngle = Math.PI / 2
 
@@ -154,7 +175,8 @@ export default class ConstellationScene {
     this._bindPointer()
 
     this._onResize = this._onResize.bind(this)
-    window.addEventListener('resize', this._onResize)
+    this._resizeObserver = new ResizeObserver(this._onResize)
+    this._resizeObserver.observe(container)
     this._onResize()
 
     this._last = null
@@ -167,9 +189,12 @@ export default class ConstellationScene {
   _buildScales() {
     const chars = this.doc.characters
     const dates = chars.map((c) => Date.parse(c.game.release))
-    const T0 = Math.min(...dates), T1 = Math.max(...dates)
+    const T1 = Math.max(...dates)
+    // Départ au 1er janvier de la première année : repères annuels équidistants.
+    const T0 = Date.UTC(new Date(Math.min(...dates)).getUTCFullYear(), 0, 1)
     const strokes = chars.map((c) => c.culture.totalStrokes)
-    const S0 = Math.min(...strokes), S1 = Math.max(...strokes)
+    const S0 = Math.floor(Math.min(...strokes) / 5) * 5
+    const S1 = Math.ceil(Math.max(...strokes) / 5) * 5
 
     const mapZ = (v, min, max) =>
       Z_FAR + ((v - min) / (max - min)) * (Z_NEAR - Z_FAR)
@@ -177,14 +202,14 @@ export default class ConstellationScene {
     this.zDate = (c) => mapZ(Date.parse(c.game.release), T0, T1)
     this.zTraits = (c) => mapZ(c.culture.totalStrokes, S0, S1)
 
-    this.chronoTicks = [2021, 2022, 2023, 2024].map((y) => ({
+    this.chronoTicks = [2020, 2021, 2022, 2023, 2024].map((y) => ({
       z: mapZ(Date.parse(`${y}-01-01`), T0, T1),
       text: String(y),
     }))
-    this.traitsTicks = [5, 10, 15, 20, 25].map((n) => ({
-      z: mapZ(n, S0, S1),
-      text: String(n),
-    }))
+    this.traitsTicks = []
+    for (let n = S0; n <= S1; n += 5) {
+      this.traitsTicks.push({ z: mapZ(n, S0, S1), text: String(n) })
+    }
   }
 
   // Un axe gradué le long de Z : une ligne, des repères, des étiquettes.
@@ -194,7 +219,8 @@ export default class ConstellationScene {
     const materials = []
     const disposables = []
 
-    const pts = [0, AXIS_Y, Z_FAR, 0, AXIS_Y, Z_NEAR]
+    const zs = ticks.map((t) => t.z)
+    const pts = [0, AXIS_Y, Math.min(...zs), 0, AXIS_Y, Math.max(...zs)]
     ticks.forEach(({ z }) => pts.push(0, AXIS_Y, z, 0, AXIS_Y - 0.25, z))
     const geo = new THREE.BufferGeometry()
     geo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3))
@@ -231,6 +257,7 @@ export default class ConstellationScene {
   goTo(deg) {
     const off = this.camera.position.clone().sub(this.controls.target)
     const from = new THREE.Spherical().setFromVector3(off)
+    from.radius = this.baseRadius
     this.settle = null
     this.tween = {
       from,
@@ -252,6 +279,7 @@ export default class ConstellationScene {
       lerp(tw.from.phi, tw.to.phi),
       lerp(tw.from.theta, tw.to.theta),
     )
+    this.baseRadius = s.radius
     this.controls.target.lerpVectors(tw.fromTarget, ORIGIN, e)
     this.camera.position.setFromSpherical(s).add(this.controls.target)
     this.camera.lookAt(this.controls.target)
@@ -316,10 +344,10 @@ export default class ConstellationScene {
         data: c,
         sprite,
         pick,
-        base: c.game.rarity === 5 ? 1.6 : 1.15, // la taille encode la rareté
+        base: c.game.rarity === 5 ? 2.6 : 1.85, // la taille encode la rareté
         size: 1,
-        grow: 0,
-        shine: 0,
+        growS: { x: 0, v: 0 },
+        shineS: { x: 0, v: 0 },
         on: 1,
         baseColor,
       })
@@ -413,36 +441,36 @@ export default class ConstellationScene {
     const it = id ? this.byId.get(id) ?? null : null
     if (it === this.selected) return
     this.selected = it
-    this.settle = it ? 'select' : 'home'
+    this.settle = true
+    this.tgt.x.copy(this.controls.target)
+    this.rad.x = this.baseRadius
   }
 
-  _orbit(target, radius) {
-    const sph = new THREE.Spherical().setFromVector3(
-      this.camera.position.clone().sub(this.controls.target),
-    )
-    sph.radius = radius
+  _orbit(target) {
+    const off = this.camera.position.clone().sub(this.controls.target)
     this.controls.target.copy(target)
-    this.camera.position.setFromSpherical(sph).add(target)
+    this.camera.position.copy(target).add(off)
   }
 
-  _stepFocus(k) {
-    const target = this.controls.target
-    const radius = this.camera.position.distanceTo(target)
-    if (this.selected) {
-      const goal = this.selected.sprite.position
-      const r = this.settle === 'select' ? radius + (FOCUS_D - radius) * k : radius
-      this._orbit(target.clone().lerp(goal, k), r)
-      if (this.settle === 'select' && Math.abs(r - FOCUS_D) < 1e-3) this.settle = null
-    } else if (this.settle === 'home') {
-      const r = radius + (CAM_D - radius) * k
-      this._orbit(target.clone().lerp(ORIGIN, k), r)
-      if (target.distanceTo(ORIGIN) < 1e-3 && Math.abs(r - CAM_D) < 1e-3) {
-        this._orbit(ORIGIN, CAM_D)
-        this.settle = null
-      }
+  _stepFocus(dt) {
+    if (!this.settle && !this.selected) return
+    springVec(this.tgt, this.selected ? this.selected.sprite.position : ORIGIN, dt)
+    spring(this.rad, this.selected ? FOCUS_D : CAM_D, dt)
+    this._orbit(this.tgt.x)
+    this.baseRadius = this.rad.x
+    if (!this.selected && this.tgt.x.length() < 1e-3 && Math.abs(this.rad.x - CAM_D) < 1e-3) {
+      this.tgt.x.set(0, 0, 0)
+      this.tgt.v.set(0, 0, 0)
+      this.rad.x = CAM_D
+      this.rad.v = 0
+      this.baseRadius = CAM_D
+    this.tgt = { x: new THREE.Vector3(), v: new THREE.Vector3() }
+    this.rad = { x: CAM_D, v: 0 }
+    this.sel = { x: 0, v: 0 }
+      this._orbit(ORIGIN)
+      this.settle = null
     }
   }
-
   _buildEdges() {
     const n = this.doc.constellation.edges.length
     this.lineGeo = new THREE.BufferGeometry()
@@ -498,7 +526,7 @@ export default class ConstellationScene {
       // paraîtraient plus petites que celles de devant
       const k = (CAM_D - z) / (CAM_D - Z_EMBLEM)
       it.size = it.base * k
-      it.sprite.scale.setScalar(it.size * (1 + 0.6 * it.grow))
+      it.sprite.scale.setScalar(it.size * (1 + 0.6 * it.growS.x))
       it.pick.scale.setScalar(k)
       byAnchor.set(it.data.node.id, p)
     })
@@ -529,10 +557,10 @@ export default class ConstellationScene {
     this.items.forEach((it) => {
       const z = zOf(it.data)
       const p = this._worldPos(it.data.node.u, it.data.node.v, z)
-      add(s * p.z, p.y, CAM_D + s * p.x, 0.35 * it.base)
+      add(s * p.z, p.y, D_SIDE + s * p.x, 0.35 * it.base)
     })
-    add(s * (Z_FAR - 0.6), AXIS_Y - 1.0, CAM_D)
-    add(s * (Z_NEAR + 0.6), AXIS_Y - 1.0, CAM_D)
+    add(s * (Z_FAR - 0.6), AXIS_Y - 1.0, D_SIDE)
+    add(s * (Z_NEAR + 0.6), AXIS_Y - 1.0, D_SIDE)
     return { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, hx: (x1 - x0) / 2, hy: (y1 - y0) / 2 }
   }
 
@@ -547,25 +575,29 @@ export default class ConstellationScene {
     const a = this.camera.aspect
     const need = (v, h) => 1.06 * Math.max(v, h / a)
     const dEmblem = CAM_D - Z_EMBLEM
-    this.tanFront = need(0.86 * EMBLEM / dEmblem, 0.76 * EMBLEM / dEmblem)
-    this.tanSide = {
-      chrono: need(this.sideExt.chrono.hy, this.sideExt.chrono.hx),
-      traits: need(this.sideExt.traits.hy, this.sideExt.traits.hx),
-    }
+    // Demi-hauteur visible à hauteur de la cible, de face et de profil.
+    this.hFront = need(0.86 * EMBLEM / dEmblem, 0.76 * EMBLEM / dEmblem) * CAM_D
+    this.titleR = TITLE_PX / h // part de la demi-hauteur laissée au titre, de profil
+    const needSide = (e) => need(e.hy / (1 - this.titleR), e.hx) * D_SIDE
+    this.hSide = { chrono: needSide(this.sideExt.chrono), traits: needSide(this.sideExt.traits) }
     this.renderer.setSize(w, h)
     this._setFov(this.face ?? 1, this.chronoSide)
   }
 
-  // De profil, on décentre l'image (setViewOffset) pour centrer le graphique
-  // sans déplacer la caméra.
+  // Vers le profil, la caméra recule en resserrant l'angle (la perspective
+  // s'aplatit, l'axe se lit juste) et l'image est décentrée sur le graphique.
   _setFov(face, chronoSide) {
     const side = chronoSide ? 'chrono' : 'traits'
     const ext = this.sideExt[side]
-    const tan = this.tanSide[side] + (this.tanFront - this.tanSide[side]) * face
+    const dist = D_SIDE + (CAM_D - D_SIDE) * face
+    this.distFactor = dist / CAM_D
+    const tan = (this.hSide[side] + (this.hFront - this.hSide[side]) * face) / dist
     this.camera.fov = 2 * Math.atan(tan) / DEG
+    const shift = ((1 - face) * D_SIDE) / dist
     const { w, h } = this.size
-    const ox = ((ext.cx * (1 - face)) / (tan * this.camera.aspect)) * (w / 2)
-    const oy = ((-ext.cy * (1 - face)) / tan) * (h / 2)
+    const sheet = window.innerWidth > 760 ? (SHEET_PX / 2) * this.focusLevel : 0
+    const ox = ((ext.cx * shift) / (tan * this.camera.aspect)) * (w / 2) + sheet
+    const oy = ((-ext.cy * shift) / tan - this.titleR * (1 - face)) * (h / 2)
     this.camera.setViewOffset(w, h, ox, oy, w, h)
   }
 
@@ -579,30 +611,30 @@ export default class ConstellationScene {
     this.emblemLevel += (this.emblemTarget - this.emblemLevel) * k
 
     if (this.tween) this._stepTween(time)
-    else this._stepFocus(k)
+    else this._stepFocus(dt)
     this.controls.update()
 
-    this.focusLevel += ((this.selected ? 1 : 0) - this.focusLevel) * k
+    spring(this.sel, this.selected ? 1 : 0, dt)
+    this.focusLevel = Math.min(1, Math.max(0, this.sel.x))
     if (this.selected) this.glowItem = this.selected
 
     this.items.forEach((it) => {
       const m = it.sprite.material
-      it.shine += ((it === this.selected ? 1 : 0) - it.shine) * k
+      spring(it.shineS, it === this.selected ? 1 : 0, dt)
+      const shine = Math.min(1, Math.max(0, it.shineS.x))
       it.on += ((this.active.has(it.data.id) ? 1 : 0.12) - it.on) * k
-      m.opacity = it.on * Math.max(it.shine, 1 - 0.7 * this.focusLevel)
-      m.color.copy(it.baseColor).multiplyScalar(1 + 1.2 * it.shine)
-      const goal = it === this.selected ? 1 : it === this.hovered ? 0.35 : 0
-      if (Math.abs(goal - it.grow) < 1e-4) return
-      it.grow += (goal - it.grow) * k
-      it.sprite.scale.setScalar(it.size * (1 + 0.6 * it.grow))
+      m.opacity = it.on * Math.max(shine, 1 - 0.7 * this.focusLevel)
+      m.color.copy(it.baseColor).multiplyScalar(1 + 1.2 * shine)
+      spring(it.growS, it === this.selected ? 1 : it === this.hovered ? 0.35 : 0, dt)
+      it.sprite.scale.setScalar(it.size * (1 + 0.6 * it.growS.x))
     })
 
     const gi = this.glowItem
-    this.glow.visible = !!gi && gi.shine > 0.01
+    this.glow.visible = !!gi && gi.shineS.x > 0.01
     if (this.glow.visible) {
       const m = this.glow.material
       m.color.set(this.doc.elements[gi.data.game.vision].color)
-      m.opacity = 0.85 * gi.shine
+      m.opacity = 0.85 * Math.min(1, gi.shineS.x)
       this.glow.position.copy(gi.sprite.position)
       this.glow.scale.setScalar(gi.size * (1.5 + 0.08 * Math.sin(time / 500)))
     }
@@ -622,10 +654,11 @@ export default class ConstellationScene {
     // Fondu croisé piloté par l'angle : de face le blason, de profil l'axe.
     const t = Math.min(1, Math.abs(az) / (Math.PI / 2))
     const face = Math.pow(Math.cos(t * Math.PI / 2), 1.4)
-    if (face !== this.face || sideChanged) {
-      this.face = face
-      this._setFov(face, chronoSide)
-    }
+    this.face = face
+    this._setFov(face, chronoSide)
+    const off = this.camera.position.clone().sub(this.controls.target)
+    off.setLength(this.baseRadius * this.distFactor)
+    this.camera.position.copy(this.controls.target).add(off)
     this.emblem.material.opacity = this.emblemLevel * face
     this.lineMat.opacity = 0.85 * face * (1 - 0.6 * this.focusLevel)
     this.axeChrono.materials.forEach((m) => {
@@ -656,7 +689,7 @@ export default class ConstellationScene {
 
   dispose() {
     this.renderer.setAnimationLoop(null)
-    window.removeEventListener('resize', this._onResize)
+    this._resizeObserver.disconnect()
     this.controls.removeEventListener('start', this._onStart)
     this.controls.dispose()
 

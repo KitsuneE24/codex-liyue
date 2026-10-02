@@ -1,4 +1,4 @@
-html, body, #root { height: 100%; margin: 0; }
+html, body, #root { height: 100%; margin: 0; overflow: hidden; }
 
 body {
   background: #07060a;
@@ -10,7 +10,41 @@ body {
 
 :root { --panel: 300px; }
 
-.stage { position: absolute; inset: 0 0 0 var(--panel); }
+.stage {
+  position: absolute;
+  inset: 0 0 0 var(--panel);
+  overflow: hidden;
+}
+
+.index::-webkit-scrollbar,
+.sheet__scroll::-webkit-scrollbar { width: 10px; }
+
+.index::-webkit-scrollbar-track,
+.sheet__scroll::-webkit-scrollbar-track {
+  margin: 6px 0;
+  border-radius: 999px;
+  background: rgba(232, 192, 125, 0.06);
+}
+
+.index::-webkit-scrollbar-thumb,
+.sheet__scroll::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: linear-gradient(#e8c07d, #9b7a45) padding-box;
+}
+
+.index::-webkit-scrollbar-thumb:hover,
+.sheet__scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(#f4d79a, #b8904f) padding-box;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  .index,
+  .sheet__scroll {
+    scrollbar-width: thin;
+    scrollbar-color: #b8904f rgba(232, 192, 125, 0.06);
+  }
+}
 
 .panel {
   position: absolute;
@@ -224,7 +258,7 @@ body {
   right: 24px;
   bottom: 24px;
   width: min(400px, calc(100% - 48px));
-  animation: sheet-in 0.35s ease-out;
+  animation: sheet-in 0.8s cubic-bezier(.22, .85, .3, 1);
 }
 
 @keyframes sheet-in {

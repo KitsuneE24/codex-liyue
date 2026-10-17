@@ -112,22 +112,16 @@ function CloseButton({ onClose }) {
   )
 }
 
-const SEAL_SEEN = 'codex-liyue:sceau-vu'
-
-function sealSeen() {
-  try { return localStorage.getItem(SEAL_SEEN) === '1' } catch { return false }
-}
+let sealSeen = false
 
 export default function Sheet({ character, element, onClose }) {
   const [flipped, setFlipped] = useState(false)
-  const [hint, setHint] = useState(() => !sealSeen())
+  const [hint, setHint] = useState(() => !sealSeen)
 
   const toggle = () => {
     setFlipped((f) => !f)
-    if (hint) {
-      setHint(false)
-      try { localStorage.setItem(SEAL_SEEN, '1') } catch { /* stockage indisponible */ }
-    }
+    sealSeen = true
+    setHint(false)
   }
 
   useEffect(() => {

@@ -34,7 +34,6 @@ export default class SealScene {
     this.camera = new THREE.PerspectiveCamera(30, 1, 0.1, 20)
     this.camera.position.set(0, 0, 4.2)
 
-    // MeshStandardMaterial réagit à la lumière : sans elle, le sceau est noir.
     this.scene.add(new THREE.AmbientLight(0xffffff, 0.9))
     const key = new THREE.DirectionalLight(0xffffff, 1.6)
     key.position.set(1.5, 2, 3)
@@ -43,8 +42,7 @@ export default class SealScene {
     rim.position.set(-3, 0.5, -1)
     this.scene.add(rim)
 
-    // BoxGeometry accepte un tableau de six matériaux :
-    // +X, -X, +Y, -Y, +Z (face avant), -Z (face arrière)
+    // +X, -X, +Y, -Y, +Z, -Z
     this.texA = faceTexture('游')
     this.texB = faceTexture('文')
     const faceA = new THREE.MeshStandardMaterial({ map: this.texA, roughness: 0.55 })
@@ -68,7 +66,7 @@ export default class SealScene {
 
   flip() {
     this.flipped = !this.flipped
-    this.targetAngle += Math.PI // on ajoute un demi-tour
+    this.targetAngle += Math.PI
   }
 
   setFlipped(flipped) {

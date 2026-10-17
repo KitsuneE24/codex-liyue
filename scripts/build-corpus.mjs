@@ -1,8 +1,4 @@
-// Construit public/data/liyue.json à partir de l'API genshin.dev
-// (instance maintenue : genshin.jmp.blue) et du fichier culture.json.
-// Télécharge aussi les portraits et l'emblème dans public/img/.
-//
-// Lancement : npm run corpus
+// npm run corpus [-- --force]
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
@@ -13,7 +9,6 @@ const OUT_JSON = new URL('public/data/liyue.json', ROOT)
 const IMG_DIR = new URL('public/img/', ROOT)
 const CHAR_DIR = new URL('public/img/characters/', ROOT)
 
-// Couleurs des sept éléments, utilisées pour teinter les étoiles.
 const ELEMENTS = {
   Anemo: { color: '#74c2a8', hanzi: '风' },
   Cryo: { color: '#9fd6e3', hanzi: '冰' },
@@ -30,7 +25,6 @@ async function getJson(path) {
   return r.json()
 }
 
-// Ne retélécharge pas une image déjà présente (passer --force pour tout refaire).
 async function download(path, dest) {
   if (existsSync(dest) && !process.argv.includes('--force')) return
   const r = await fetch(`${API}${path}`)
@@ -38,8 +32,6 @@ async function download(path, dest) {
   await writeFile(dest, Buffer.from(await r.arrayBuffer()))
 }
 
-// Nombre de traits d'un caractère : longueur du tableau `strokes` de
-// hanzi-writer-data (données Make Me a Hanzi, un tracé par trait).
 const HANZI_DATA = 'https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0'
 const strokeCache = new Map()
 async function strokesOf(char) {
@@ -60,8 +52,7 @@ const dictionary = new Map(
     .map((e) => [e.character, e]),
 )
 
-// Formes simplifiées des clés, absentes du bloc Unicode des 214 clés Kangxi.
-// Vérifié contre Unihan (kRSUnicode).
+// Clés simplifiées hors du bloc Kangxi (Unihan)
 const KANGXI_SIMPLIFIED = {
   '丷': 12, '刂': 18, '王': 96, '纟': 120, '⺼': 130,
   '艹': 140, '钅': 167, '门': 169, '鸟': 196,
@@ -105,7 +96,6 @@ async function cultureOf(entry) {
 const culture = JSON.parse(await readFile(new URL('scripts/culture.json', ROOT), 'utf8'))
 const layout = JSON.parse(await readFile(new URL('scripts/layout.json', ROOT), 'utf8'))
 
-// Pixels du blason → repère u, v ∈ [-1, 1], v vers le haut.
 const half = layout.size / 2
 const nodeOf = new Map(
   layout.nodes.map((n) => [
@@ -117,14 +107,13 @@ const nodeIds = new Set(layout.nodes.map((n) => n.id))
 const badEdges = layout.edges.filter(([a, b]) => !nodeIds.has(a) || !nodeIds.has(b))
 if (badEdges.length) throw new Error(`Arêtes vers un nœud inconnu : ${JSON.stringify(badEdges)}`)
 
-// /characters/all ne renvoie pas l'identifiant : on le reprend de /characters.
+// /characters/all n'a pas d'identifiant
 const ids = await getJson('/characters')
 const all = await getJson('/characters/all')
 const liyue = all
   .map((c, i) => ({ ...c, id: ids[i] }))
   .filter((c) => c.nation === 'Liyue')
 
-// Garde-fou : si l'API change l'ordre d'une des deux listes, on le saura.
 const slug = (s) => s.toLowerCase().replace(/[^a-z]+/g, '-')
 const mismatch = liyue.filter((c) => slug(c.name) !== c.id)
 if (mismatch.length) {

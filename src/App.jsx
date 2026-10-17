@@ -31,7 +31,6 @@ export default function App() {
     if (id) setCollapsed(true)
   }, [])
 
-  // Un seul prédicat, passé à la scène 3D et à l'index.
   const predicate = useCallback((c) => {
     if (filters.vision && c.game.vision !== filters.vision) return false
     if (filters.weapon && c.game.weapon !== filters.weapon) return false
@@ -44,7 +43,6 @@ export default function App() {
     return true
   }, [filters])
 
-  // Sur desktop, le panneau déplié se replie dès qu'on agit ailleurs ou avec Échap.
   useEffect(() => {
     if (mobile || collapsed) return
     const replier = (e) => {

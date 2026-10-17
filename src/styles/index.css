@@ -364,11 +364,11 @@ body {
 .sheet__lift {
   position: absolute;
   inset: 0;
-  perspective: 1000px; /* profondeur de la perspective */
+  perspective: 1000px;
   animation: sheet-lift-a 0.75s ease-in-out;
 }
 
-/* Deux animations identiques : changer de nom relance la réduction à mi-course. */
+/* deux animations identiques pour relancer l'effet */
 .sheet.is-flipped .sheet__lift { animation-name: sheet-lift-b; }
 
 @keyframes sheet-lift-a { 50% { transform: scale(0.94); } }
@@ -377,7 +377,7 @@ body {
 .sheet__flip {
   position: absolute;
   inset: 0;
-  transform-style: preserve-3d; /* les enfants vivent en 3D */
+  transform-style: preserve-3d;
   transition: transform 0.75s cubic-bezier(.22, .85, .3, 1);
 }
 
@@ -387,7 +387,7 @@ body {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  backface-visibility: hidden; /* on ne voit pas le dos */
+  backface-visibility: hidden;
   border-radius: 16px;
   border: 1px solid rgba(232, 192, 125, 0.3);
   background: linear-gradient(160deg, #17131c, #0d0b10);
@@ -395,12 +395,10 @@ body {
 }
 
 .sheet__side--back {
-  transform: rotateY(180deg); /* déjà retournée */
+  transform: rotateY(180deg);
   background: linear-gradient(160deg, #1d1410, #0e0a08);
 }
 
-/* La zone de lecture s'arrête sous la croix et au-dessus du sceau :
-   aucun bouton ne recouvre le texte. */
 .sheet__scroll {
   position: absolute;
   inset: 48px 0 104px;
@@ -507,7 +505,7 @@ body {
 
 .seal__hit:focus-visible { outline: 2px solid #e8c07d; outline-offset: 2px; }
 
-/* Première ouverture : une main vient appuyer sur le sceau. */
+/* Indication du sceau */
 .seal-hint {
   position: absolute;
   bottom: 56px;
@@ -582,7 +580,6 @@ body {
 
 @media (max-width: 760px) {
   :root { --panel: 0px; }
-
 
   .panel {
     z-index: 2;

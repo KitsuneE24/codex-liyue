@@ -1,4 +1,4 @@
-// Icône « touch_app » de Material Icons (Apache 2.0).
+// touch_app, Material Icons (Apache 2.0)
 export default function HandIcon({ className }) {
   return (
     <svg className={className} viewBox="0 0 24 24" aria-hidden="true">

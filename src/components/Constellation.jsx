@@ -10,8 +10,6 @@ export default function Constellation({ doc, selectedId, onSelect, predicate }) 
   const [aTourne, setATourne] = useState(false)
 
   useEffect(() => {
-    // La scène ne prévient React que quand la vue la plus proche change,
-    // pas à chaque image.
     const scene = new ConstellationScene(hostRef.current, doc, {
       onViewChange: setCourante,
       onSelect,

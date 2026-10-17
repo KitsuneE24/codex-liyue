@@ -2,19 +2,17 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { vueProche } from '../data/views.js'
 
-// Le blason occupe un plan carré de 2 × EMBLEM unités.
-// Les ancrages des personnages sont donnés dans son repère (u, v ∈ [-1, 1]).
-const EMBLEM = 7.4 // demi-taille du plan du blason
-const Z_EMBLEM = -7.0 // le blason, écran de projection, tout au fond
-const Z_NEAR = 7.0 // profondeur de la valeur la plus haute
-const Z_FAR = -6.0 // profondeur de la valeur la plus basse
-const CAM_D = 17.0 // distance de la caméra à l'origine
-const AXIS_Y = -6.2 // hauteur des axes gradués, sous la figure
-const FOCUS_D = 10 // distance de la caméra à l'étoile sélectionnée
-const SHEET_PX = 448 // largeur de la fiche et de ses marges (index.css)
-const OMEGA = 5 // raideur du ressort de sélection
-const TITLE_PX = 72 // bande du titre de vue, en pixels
-const D_SIDE = 400 // de profil, la caméra recule pour aplatir la perspective
+const EMBLEM = 7.4 // demi-côté du blason
+const Z_EMBLEM = -7.0 // profondeur du blason
+const Z_NEAR = 7.0 // profondeur max des étoiles
+const Z_FAR = -6.0 // profondeur min des étoiles
+const CAM_D = 17.0 // distance caméra
+const AXIS_Y = -6.2 // hauteur des axes gradués
+const FOCUS_D = 10 // distance caméra en sélection
+const SHEET_PX = 448 // largeur de la fiche (index.css)
+const OMEGA = 5 // raideur des ressorts
+const TITLE_PX = 72 // hauteur du titre de vue
+const D_SIDE = 400 // distance caméra de profil
 const DEG = Math.PI / 180
 const ORIGIN = new THREE.Vector3()
 
@@ -25,7 +23,6 @@ function starTexture() {
   const ctx = cv.getContext('2d')
   const c = s / 2
 
-  // une aigrette = un dégradé radial étiré dans une direction
   const spike = (angle, len, width) => {
     ctx.save()
     ctx.translate(c, c)
@@ -41,9 +38,9 @@ function starTexture() {
     ctx.restore()
   }
 
-  spike(0, 1, 0.055) // horizontale
-  spike(Math.PI / 2, 1, 0.042) // verticale
-  spike(Math.PI / 4, 0.34, 0.03) // deux diagonales discrètes
+  spike(0, 1, 0.055)
+  spike(Math.PI / 2, 1, 0.042)
+  spike(Math.PI / 4, 0.34, 0.03)
   spike(-Math.PI / 4, 0.34, 0.03)
 
   const g = ctx.createRadialGradient(c, c, 0, c, c, c * 0.16)
@@ -75,9 +72,7 @@ function glowTexture() {
   return tex
 }
 
-// Fond façon fiche personnage de Genshin : nébuleuse teintée par l'élément,
-// sombre au centre pour laisser le blason et les étoiles lisibles, et orbes
-// flous qui montent. Quad plein écran dessiné avant tout le reste.
+// Fond animé
 const BACKDROP_VERTEX = `
 varying vec2 vUv;
 void main() {
@@ -142,9 +137,7 @@ void main() {
 }
 `
 
-// Feuille de ginkgo d'après l'illustration de Liyue : large éventail sans
-// contour, jaune au bord et orangé vers la base, entailles sombres sur le
-// pourtour, deux fentes en amande au centre, rayons clairs et grain.
+// Feuille de ginkgo
 function leafTexture() {
   const s = 256
   const c = s / 2
@@ -237,8 +230,6 @@ const smoothstep = (a, b, x) => {
   return t * t * (3 - 2 * t)
 }
 
-// Texte → texture de canvas. La largeur du canvas suit celle du texte,
-// on renvoie donc aussi ses proportions pour dimensionner le sprite.
 function labelTexture(text) {
   const font = '600 34px Inter, sans-serif'
   const cv = document.createElement('canvas')
@@ -246,7 +237,7 @@ function labelTexture(text) {
   ctx.font = font
   cv.width = Math.ceil(ctx.measureText(text).width) + 24
   cv.height = 64
-  ctx.font = font // redimensionner le canvas réinitialise le contexte
+  ctx.font = font // réinitialisée par le redimensionnement
   ctx.fillStyle = '#e8c07d'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
@@ -256,7 +247,7 @@ function labelTexture(text) {
   return { tex, aspect: cv.width / cv.height }
 }
 
-// Ressort amorti critique : part à vitesse nulle, arrive sans rebond.
+// Ressort amorti critique
 function spring(s, goal, dt) {
   s.v += (OMEGA * OMEGA * (goal - s.x) - 2 * OMEGA * s.v) * dt
   s.x += s.v * dt
@@ -285,20 +276,16 @@ export default class ConstellationScene {
     container.appendChild(this.renderer.domElement)
 
     this.scene = new THREE.Scene()
-    // Le fond (nébuleuse et feuilles) est rendu à part, avant la scène.
     this.bgScene = new THREE.Scene()
     this.bgCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1)
     this.renderer.autoClear = false
 
-    // Caméra strictement axiale au repos : la correction anamorphique
-    // suppose une caméra sur l'axe Z, visant l'origine.
     this.camera = new THREE.PerspectiveCamera(46, 1, 0.1, 1000)
     this.camera.position.set(0, 0, CAM_D)
     this.camera.lookAt(0, 0, 0)
 
     this.controls = new OrbitControls(this.camera, this.renderer.domElement)
     this.controls.enableDamping = true
-    // À 180° on verrait le dos du blason : on borne la rotation.
     this.controls.minAzimuthAngle = -90 * DEG
     this.controls.maxAzimuthAngle = 90 * DEG
     this.controls.enablePan = false
@@ -310,7 +297,6 @@ export default class ConstellationScene {
     this.controls.minPolarAngle = Math.PI / 2
     this.controls.maxPolarAngle = Math.PI / 2
 
-    // Une transition de carrousel s'interrompt si l'on reprend la main.
     this.tween = null
     this._onStart = () => { this.tween = null }
     this.controls.addEventListener('start', this._onStart)
@@ -325,8 +311,6 @@ export default class ConstellationScene {
     this.axeChrono = this._buildAxis(this.chronoTicks)
     this.axeTraits = this._buildAxis(this.traitsTicks)
 
-    // De face (azimut 0), on part côté traits ; la bascule se fera au
-    // premier passage par zéro.
     this.chronoSide = false
     this.starBoost = 1
     this.place(this.zTraits)
@@ -335,9 +319,11 @@ export default class ConstellationScene {
       chrono: this._sideExtent(this.zDate, 1),
       traits: this._sideExtent(this.zTraits, -1),
     }
+    const vs = doc.characters.map((c) => c.node.v)
+    this.frontCy = ((Math.max(...vs) + Math.min(...vs)) / 2) * EMBLEM / (CAM_D - Z_EMBLEM)
 
     this.raycaster = new THREE.Raycaster()
-    this.pointer = new THREE.Vector2(-2, -2) // hors écran au départ
+    this.pointer = new THREE.Vector2(-2, -2)
     this.hovered = null
     this.selected = null
     this.settle = null
@@ -353,13 +339,10 @@ export default class ConstellationScene {
     this._animate = this._animate.bind(this)
     this.renderer.setAnimationLoop(this._animate)  }
 
-  // Deux variables → deux profondeurs, linéairement.
-  // Bornes calculées une fois sur le corpus.
   _buildScales() {
     const chars = this.doc.characters
     const dates = chars.map((c) => Date.parse(c.game.release))
     const T1 = Math.max(...dates)
-    // Départ au 1er janvier de la première année : repères annuels équidistants.
     const T0 = Date.UTC(new Date(Math.min(...dates)).getUTCFullYear(), 0, 1)
     const strokes = chars.map((c) => c.culture.totalStrokes)
     const S0 = Math.floor(Math.min(...strokes) / 5) * 5
@@ -369,7 +352,7 @@ export default class ConstellationScene {
       Z_FAR + ((v - min) / (max - min)) * (Z_NEAR - Z_FAR)
 
     this.zDate = (c) => mapZ(Date.parse(c.game.release), T0, T1)
-    // axe inversé : vu de profil, les traits se lisent croissants de gauche à droite
+    // axe inversé
     this.zTraits = (c) => mapZ(S0 + S1 - c.culture.totalStrokes, S0, S1)
 
     this.chronoTicks = [2020, 2021, 2022, 2023, 2024].map((y) => ({
@@ -382,8 +365,7 @@ export default class ConstellationScene {
     }
   }
 
-  // Un axe gradué le long de Z : une ligne, des repères, des étiquettes.
-  // On garde la liste des matériaux pour piloter leur opacité.
+  // Axe gradué
   _buildAxis(ticks) {
     const group = new THREE.Group()
     const materials = []
@@ -421,9 +403,6 @@ export default class ConstellationScene {
     return { group, materials, disposables }
   }
 
-  // Fait glisser la caméra vers un azimut (en degrés), en une seconde.
-  // Elle revient aussi à l'horizontale et à sa distance de repos :
-  // l'alignement sur le blason ne tient que caméra axiale, à CAM_D.
   goTo(deg) {
     const off = this.camera.position.clone().sub(this.controls.target)
     const from = new THREE.Spherical().setFromVector3(off)
@@ -460,7 +439,7 @@ export default class ConstellationScene {
     const geo = new THREE.PlaneGeometry(EMBLEM * 2, EMBLEM * 2)
     const mat = new THREE.MeshBasicMaterial({
       transparent: true,
-      opacity: 0, // monte en fondu au chargement
+      opacity: 0,
       depthWrite: false,
       color: 0xe8c07d,
     })
@@ -468,15 +447,13 @@ export default class ConstellationScene {
     this.emblem.position.z = Z_EMBLEM
     this.scene.add(this.emblem)
 
-    // emblemLevel monte en fondu jusqu'à emblemTarget ; l'opacité
-    // affichée y applique ensuite le fondu croisé piloté par l'angle.
     this.emblemLevel = 0
     this.emblemTarget = 0
     new THREE.TextureLoader().load('/img/liyue-emblem.webp', (tex) => {
       tex.colorSpace = THREE.SRGBColorSpace
       mat.map = tex
       mat.needsUpdate = true
-      this.emblemTarget = 0.34 // opacité visée : présent, jamais dominant
+      this.emblemTarget = 0.34
     })
   }
 
@@ -495,7 +472,7 @@ export default class ConstellationScene {
         map: this.starTex,
         transparent: true,
         depthWrite: false,
-        blending: THREE.AdditiveBlending, // les lumières s'additionnent
+        blending: THREE.AdditiveBlending,
         toneMapped: false,
         color: new THREE.Color(0xffffff).lerp(color, 0.45),
       })
@@ -503,8 +480,7 @@ export default class ConstellationScene {
       const sprite = new THREE.Sprite(mat)
       this.group.add(sprite)
 
-      // Un Sprite lumineux est difficile à viser : on ajoute une sphère
-      // invisible, plus large, qui sert uniquement de cible.
+      // cible de clic invisible
       const pick = new THREE.Mesh(this.pickGeo, this.pickMat)
       pick.userData.id = c.id
       this.group.add(pick)
@@ -514,7 +490,7 @@ export default class ConstellationScene {
         data: c,
         sprite,
         pick,
-        base: c.game.rarity === 5 ? 2.6 : 1.85, // la taille encode la rareté
+        base: c.game.rarity === 5 ? 2.6 : 1.85, // rareté
         size: 1,
         growS: { x: 0, v: 0 },
         shineS: { x: 0, v: 0 },
@@ -591,7 +567,7 @@ export default class ConstellationScene {
       if (!downAt) return
       const bouge = Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y)
       downAt = null
-      if (bouge > 8) return // c'était une rotation, pas un clic
+      if (bouge > 8) return
       this._setPointer(e)
       this.onSelect?.(this._pick())
     }
@@ -608,7 +584,6 @@ export default class ConstellationScene {
     el.addEventListener('pointerleave', this._onLeave)
   }
 
-  // Le shader écrit directement en sRGB : on lui passe la couleur non linéarisée.
   _tintOf(vision) {
     return new THREE.Color(this.doc.elements[vision]?.color ?? '#f2b723').convertLinearToSRGB()
   }
@@ -631,9 +606,7 @@ export default class ConstellationScene {
     this.bgScene.add(this.backdrop)
   }
 
-  // Les feuilles vivent dans le plan du fond, en coordonnées d'écran
-  // (x ∈ [-aspect, aspect], y ∈ [-1, 1]) : elles restent derrière la scène
-  // quelle que soit la vue.
+  // Feuilles
   _buildLeaves() {
     this.leafTex = leafTexture()
     this.leaves = []
@@ -657,8 +630,6 @@ export default class ConstellationScene {
     }
   }
 
-  // Rectangle occupé à l'écran par le contenu : étoiles, blason de face,
-  // axe gradué de profil. Les feuilles s'effacent avant d'y entrer.
   _contentRect() {
     const a = this.camera.aspect
     const v = new THREE.Vector3()
@@ -690,12 +661,9 @@ export default class ConstellationScene {
     return r < left ? -a + r : rect.cx + rect.hw + (r - Math.max(0, left))
   }
 
-  // Chute en diagonale avec balancement ; l'écrasement horizontal imite la
-  // feuille qui se retourne.
   _stepLeaves(dt, s) {
     const rect = this._contentRect()
     const level = (this.emblemLevel / 0.34) * (1 - 0.6 * this.focusLevel)
-    // sur un écran en portrait, des feuilles plus petites
     const k = Math.min(1, 0.4 + 0.6 * this.camera.aspect)
     this.leaves.forEach((l) => {
       l.p += l.rate * dt
@@ -706,7 +674,6 @@ export default class ConstellationScene {
       const x = l.x + 0.15 * l.p + 0.04 * Math.sin(s * 0.7 + l.phase)
       const y = (1 - l.p * 2) * (1 + l.h)
       const h = l.h * k
-      // distance du bord de la feuille au rectangle du contenu
       const d = Math.max(Math.abs(x - rect.cx) - rect.hw, Math.abs(y - rect.cy) - rect.hh) - h / 2
       const clear = smoothstep(0, 0.1, d)
       l.sprite.position.set(x, y, 0)
@@ -769,12 +736,7 @@ export default class ConstellationScene {
     this.group.add(new THREE.LineSegments(this.lineGeo, this.lineMat))
   }
 
-  /**
-   * Repère du blason (u, v ∈ [-1, 1]) → coordonnées monde.
-   * Le facteur k compense la perspective : plus l'étoile est proche de la
-   * caméra, plus on la rapproche de l'axe pour qu'elle se projette au
-   * même endroit que son point sur le blason.
-   */
+  // Repère du blason (u, v) → monde
   _worldPos(u, v, z) {
     const k = (CAM_D - z) / (CAM_D - Z_EMBLEM)
     return new THREE.Vector3(u * EMBLEM * k, v * EMBLEM * k, z)
@@ -803,8 +765,6 @@ export default class ConstellationScene {
       const p = this._worldPos(it.data.node.u, it.data.node.v, z)
       it.sprite.position.copy(p)
       it.pick.position.copy(p)
-      // même compensation sur la taille, sinon les étoiles du fond
-      // paraîtraient plus petites que celles de devant
       const k = (CAM_D - z) / (CAM_D - Z_EMBLEM)
       it.size = it.base * k * this.starBoost
       it.sprite.scale.setScalar(it.size * (1 + 0.6 * it.growS.x))
@@ -825,8 +785,7 @@ export default class ConstellationScene {
     return byAnchor
   }
 
-  // Emprise d'une vue de profil, en tangentes vues depuis la caméra
-  // (s = 1 : caméra à gauche, côté chronologie ; s = -1 : à droite).
+  // s = 1 : côté chronologie, s = -1 : côté traits
   _sideExtent(zOf, s) {
     let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity
     const add = (lat, y, depth, m = 0) => {
@@ -852,21 +811,17 @@ export default class ConstellationScene {
     this.camera.aspect = w / h
     this.size = { w, h }
 
-    // Grossissement des étoiles, plus fort sur téléphone où le champ s'ouvre
-    // pour faire tenir le blason.
     const boost = window.innerWidth <= 760 ? 1.7 : 1.4
     if (boost !== this.starBoost) {
       this.starBoost = boost
       this.place(this.chronoSide ? this.zDate : this.zTraits)
     }
 
-    // On ouvre l'angle de champ au lieu de reculer : l'anamorphose suppose CAM_D.
     const a = this.camera.aspect
     const need = (v, h) => 1.06 * Math.max(v, h / a)
     const dEmblem = CAM_D - Z_EMBLEM
-    // Demi-hauteur visible à hauteur de la cible, de face et de profil.
     this.hFront = need(0.86 * EMBLEM / dEmblem, 0.76 * EMBLEM / dEmblem) * CAM_D
-    this.titleR = TITLE_PX / h // part de la demi-hauteur laissée au titre, de profil
+    this.titleR = TITLE_PX / h
     const needSide = (e) => need(e.hy / (1 - this.titleR), e.hx) * D_SIDE
     this.hSide = { chrono: needSide(this.sideExt.chrono), traits: needSide(this.sideExt.traits) }
     this.renderer.setSize(w, h)
@@ -876,8 +831,6 @@ export default class ConstellationScene {
     this._setFov(this.face ?? 1, this.chronoSide)
   }
 
-  // Vers le profil, la caméra recule en resserrant l'angle (la perspective
-  // s'aplatit, l'axe se lit juste) et l'image est décentrée sur le graphique.
   _setFov(face, chronoSide) {
     const side = chronoSide ? 'chrono' : 'traits'
     const ext = this.sideExt[side]
@@ -889,16 +842,15 @@ export default class ConstellationScene {
     const { w, h } = this.size
     const sheet = window.innerWidth > 760 ? (SHEET_PX / 2) * this.focusLevel : 0
     const ox = ((ext.cx * shift) / (tan * this.camera.aspect)) * (w / 2) + sheet
-    const oy = ((-ext.cy * shift) / tan - this.titleR * (1 - face)) * (h / 2)
+    const front = (face * (1 - this.focusLevel) * CAM_D) / dist
+    const oy = ((-ext.cy * shift - this.frontCy * front) / tan - this.titleR * (1 - face)) * (h / 2)
     this.camera.setViewOffset(w, h, ox, oy, w, h)
   }
 
   _animate(time) {
-    // dt en secondes, borné pour éviter un saut après un onglet en veille
     const dt = this._last === null ? 0 : Math.min((time - this._last) / 1000, 0.1)
     this._last = time
 
-    // fondu d'apparition du blason, indépendant du framerate
     const k = 1 - Math.pow(0.001, dt)
     this.emblemLevel += (this.emblemTarget - this.emblemLevel) * k
     const at = time / 1000
@@ -939,9 +891,6 @@ export default class ConstellationScene {
       this.onRotate = null
     }
 
-    // Le signe de l'angle choisit la variable. La bascule est franche et se
-    // produit pile à 0°, où les deux répartitions donnent la même image
-    // projetée : elle est donc invisible.
     const chronoSide = az < 0
     const sideChanged = chronoSide !== this.chronoSide
     if (sideChanged) {
@@ -949,7 +898,6 @@ export default class ConstellationScene {
       this.place(chronoSide ? this.zDate : this.zTraits)
     }
 
-    // Fondu croisé piloté par l'angle : de face le blason, de profil l'axe.
     const t = Math.min(1, Math.abs(az) / (Math.PI / 2))
     const face = Math.pow(Math.cos(t * Math.PI / 2), 1.4)
     this.face = face
@@ -971,7 +919,6 @@ export default class ConstellationScene {
       m.opacity = chronoSide ? 0 : m.userData.base * (1 - face)
     })
 
-    // React n'est prévenu que lorsque la vue la plus proche change.
     const vue = vueProche(az / DEG)
     if (vue !== this.vue) {
       this.vue = vue

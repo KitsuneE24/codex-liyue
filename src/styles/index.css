@@ -339,6 +339,30 @@ body {
   25% { opacity: 1; transform: translateX(var(--nudge)); }
 }
 
+.source {
+  position: fixed;
+  right: 12px;
+  bottom: 4px;
+  margin: 0;
+  font-size: 11px;
+  color: rgba(232, 192, 125, 0.55);
+  pointer-events: none;
+}
+
+.source::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 6px;
+  border-radius: 50%;
+  vertical-align: 1px;
+  background: #74c2a8;
+}
+
+.source--partiel::before { background: #f2b723; }
+.source--local::before { background: #9a8f80; }
+
 .sr-only {
   position: absolute;
   width: 1px;

@@ -7,6 +7,12 @@ import useCorpus from './hooks/useCorpus.js'
 import useMediaQuery from './hooks/useMediaQuery.js'
 import { FILTRES_VIDES, normaliser } from './data/filters.js'
 
+const SOURCES = {
+  direct: 'Données en direct : genshin.jmp.blue · hanzi-writer-data',
+  partiel: 'Données en partie en direct, complétées par la copie locale',
+  local: 'API indisponible : copie locale des données',
+}
+
 function SearchIcon() {
   return (
     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
@@ -132,6 +138,8 @@ export default function App() {
         onSelect={select}
         predicate={predicate}
       />
+
+      <p className={`source source--${doc.live}`}>{SOURCES[doc.live]}</p>
 
       {selected && (
         <Sheet

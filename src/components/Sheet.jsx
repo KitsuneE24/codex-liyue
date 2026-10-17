@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import Seal from './Seal.jsx'
+import HandIcon from './HandIcon.jsx'
 import { ARMES } from '../data/labels.js'
 
 const IDS = /[⿰-⿻？?]/gu
@@ -111,8 +112,23 @@ function CloseButton({ onClose }) {
   )
 }
 
+const SEAL_SEEN = 'codex-liyue:sceau-vu'
+
+function sealSeen() {
+  try { return localStorage.getItem(SEAL_SEEN) === '1' } catch { return false }
+}
+
 export default function Sheet({ character, element, onClose }) {
   const [flipped, setFlipped] = useState(false)
+  const [hint, setHint] = useState(() => !sealSeen())
+
+  const toggle = () => {
+    setFlipped((f) => !f)
+    if (hint) {
+      setHint(false)
+      try { localStorage.setItem(SEAL_SEEN, '1') } catch { /* stockage indisponible */ }
+    }
+  }
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose() }
@@ -142,7 +158,13 @@ export default function Sheet({ character, element, onClose }) {
         </div>
       </div>
 
-      <Seal flipped={flipped} onToggle={() => setFlipped((f) => !f)} />
+      <Seal flipped={flipped} onToggle={toggle} />
+      {hint && (
+        <div className="seal-hint" aria-hidden="true">
+          <span className="seal-hint__ripple" />
+          <HandIcon className="seal-hint__hand" />
+        </div>
+      )}
     </aside>
   )
 }

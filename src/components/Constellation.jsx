@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import ConstellationScene from '../three/ConstellationScene.js'
-import Carousel from './Carousel.jsx'
+import HandIcon from './HandIcon.jsx'
 import { VUES } from '../data/views.js'
 
 export default function Constellation({ doc, selectedId, onSelect, predicate }) {
   const hostRef = useRef(null)
   const sceneRef = useRef(null)
   const [courante, setCourante] = useState(VUES[1])
+  const [aTourne, setATourne] = useState(false)
 
   useEffect(() => {
     // La scène ne prévient React que quand la vue la plus proche change,
@@ -14,6 +15,7 @@ export default function Constellation({ doc, selectedId, onSelect, predicate }) 
     const scene = new ConstellationScene(hostRef.current, doc, {
       onViewChange: setCourante,
       onSelect,
+      onRotate: () => setATourne(true),
     })
     sceneRef.current = scene
     return () => {
@@ -36,12 +38,23 @@ export default function Constellation({ doc, selectedId, onSelect, predicate }) 
       {courante.titre && (
         <h2 key={courante.cle} className="vue-titre">{courante.titre}</h2>
       )}
-      {!selectedId && (
-        <Carousel
-          courante={courante}
-          onGo={(v) => sceneRef.current?.goTo(v.deg)}
-        />
-      )}
+      <div
+        className={`rotate-hint${aTourne || selectedId ? ' is-done' : ''}`}
+        aria-hidden={aTourne || !!selectedId}
+      >
+        <div className="rotate-hint__gesture">
+          <svg className="rotate-hint__arrow rotate-hint__arrow--left" viewBox="0 0 36 16">
+            <path d="M34 8H3M10 1 3 8l7 7" />
+          </svg>
+          <div className="rotate-hint__lane">
+            <HandIcon className="rotate-hint__hand" />
+          </div>
+          <svg className="rotate-hint__arrow rotate-hint__arrow--right" viewBox="0 0 36 16">
+            <path d="M2 8h31M26 1l7 7-7 7" />
+          </svg>
+        </div>
+        <p>Glissez vers la gauche ou la droite pour tourner autour du blason</p>
+      </div>
     </div>
   )
 }

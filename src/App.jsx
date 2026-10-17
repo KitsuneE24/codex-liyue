@@ -3,6 +3,7 @@ import Constellation from './components/Constellation.jsx'
 import Sheet from './components/Sheet.jsx'
 import Filters from './components/Filters.jsx'
 import CharacterIndex from './components/CharacterIndex.jsx'
+import Loader from './components/Loader.jsx'
 import useCorpus from './hooks/useCorpus.js'
 import useMediaQuery from './hooks/useMediaQuery.js'
 import { FILTRES_VIDES, normaliser } from './data/filters.js'
@@ -23,7 +24,8 @@ function SearchIcon() {
 }
 
 export default function App() {
-  const { doc, error } = useCorpus()
+  const { doc, error, progress } = useCorpus()
+  const [loaderGone, setLoaderGone] = useState(false)
   const [selectedId, setSelectedId] = useState(null)
   const [filters, setFilters] = useState(FILTRES_VIDES)
   const [panelOpen, setPanelOpen] = useState(false)
@@ -65,7 +67,7 @@ export default function App() {
   }, [mobile, collapsed])
 
   if (error) return <p className="status">Corpus introuvable : {error.message}</p>
-  if (!doc) return <p className="status">Chargement…</p>
+  if (!doc) return <><Loader key="loader" progress={progress} /></>
 
   const selected = doc.characters.find((c) => c.id === selectedId)
   const visibles = doc.characters.filter(predicate)
@@ -148,6 +150,10 @@ export default function App() {
           element={doc.elements[selected.game.vision]}
           onClose={close}
         />
+      )}
+
+      {!loaderGone && (
+        <Loader key="loader" progress={progress} leaving onDone={() => setLoaderGone(true)} />
       )}
     </>
   )

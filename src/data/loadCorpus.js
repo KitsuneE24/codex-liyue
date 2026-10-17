@@ -11,14 +11,25 @@ async function getJson(url, signal) {
 
 const valeur = (res) => (res.status === 'fulfilled' ? res.value : null)
 
-export async function loadCorpus() {
+export async function loadCorpus(onProgress = () => {}) {
   const doc = await getJson('/data/liyue.json')
 
   const signal = AbortSignal.timeout(TIMEOUT)
   const hanzi = [...new Set(doc.characters.flatMap((c) => c.culture.chars.map((ch) => ch.char)))]
+  const total = doc.characters.length + hanzi.length
+  const lit = new Set()
+  let done = 0
+  const report = () => onProgress({ base: doc, done, total, lit: new Set(lit) })
+  const suivre = (promise, id) => promise.finally(() => {
+    done += 1
+    if (id) lit.add(id)
+    report()
+  })
+  report()
+
   const [games, traits] = await Promise.all([
-    Promise.allSettled(doc.characters.map((c) => getJson(`${API}/characters/${c.id}`, signal))),
-    Promise.allSettled(hanzi.map((ch) => getJson(`${STROKES}/${encodeURIComponent(ch)}.json`, signal))),
+    Promise.allSettled(doc.characters.map((c) => suivre(getJson(`${API}/characters/${c.id}`, signal), c.id))),
+    Promise.allSettled(hanzi.map((ch) => suivre(getJson(`${STROKES}/${encodeURIComponent(ch)}.json`, signal)))),
   ])
 
   const strokesOf = new Map(

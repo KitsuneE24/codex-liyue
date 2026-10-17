@@ -339,6 +339,114 @@ body {
   25% { opacity: 1; transform: translateX(var(--nudge)); }
 }
 
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: radial-gradient(ellipse at 50% 45%, #1a140c, #07060a 70%);
+}
+
+.loader.is-leaving {
+  pointer-events: none;
+  animation: loader-out 0.9s ease-in 0.35s forwards;
+}
+
+@keyframes loader-out { to { opacity: 0; } }
+
+.loader__stage {
+  position: absolute;
+  inset: 0 0 0 var(--rail);
+}
+
+.loader__sky { position: absolute; inset: 0; }
+
+.loader__emblem {
+  opacity: 0;
+  animation: loader-emblem 1.2s ease-out forwards;
+}
+
+@keyframes loader-emblem { to { opacity: 0.18; } }
+
+.loader__edge {
+  stroke: #f4d79a;
+  stroke-width: 1;
+  stroke-opacity: 0.7;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: loader-edge 0.6s ease-out forwards;
+}
+
+@keyframes loader-edge { to { stroke-dashoffset: 0; } }
+
+.loader__halo {
+  opacity: 0;
+  filter: blur(6px);
+  transition: opacity 0.5s ease-out;
+}
+
+.loader__core {
+  fill: #fff;
+  opacity: 0.18;
+  transform: scale(0.6);
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: opacity 0.4s ease-out, transform 0.5s cubic-bezier(.3, 1.8, .5, 1);
+}
+
+.loader__star.is-lit .loader__halo { opacity: 0.55; }
+.loader__star.is-lit .loader__core { opacity: 1; transform: none; }
+
+.loader__progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px 14px;
+  padding: 0 16px;
+  text-align: center;
+  transition: opacity 0.3s ease-out;
+}
+
+.loader.is-leaving .loader__progress { opacity: 0; }
+
+.loader__title {
+  margin: 0;
+  color: #e8c07d;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.loader__title span { margin-right: 8px; }
+
+.loader__bar {
+  width: min(200px, 50vw);
+  height: 2px;
+  border-radius: 1px;
+  background: rgba(232, 192, 125, 0.18);
+  overflow: hidden;
+}
+
+.loader__bar span {
+  display: block;
+  height: 100%;
+  background: #e8c07d;
+  transform-origin: left;
+  transition: transform 0.25s ease-out;
+}
+
+.loader__count {
+  margin: 0;
+  color: rgba(232, 192, 125, 0.6);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  min-width: 4.5em;
+  text-align: left;
+}
+
 .source {
   position: fixed;
   right: 12px;
@@ -604,6 +712,8 @@ body {
 
 @media (max-width: 760px) {
   :root { --panel: 0px; }
+
+  .loader__stage { left: 0; }
 
   .panel {
     z-index: 2;

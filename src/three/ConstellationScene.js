@@ -13,7 +13,18 @@ const SHEET_PX = 448 // largeur de la fiche (index.css)
 const OMEGA = 5 // raideur des ressorts
 const TITLE_PX = 72 // hauteur du titre de vue
 const D_SIDE = 400 // distance caméra de profil
+const FRONT_V = 0.86 // part du blason visible de face, en hauteur
+const FRONT_H = 0.76 // part du blason visible de face, en largeur
+const MARGE = 1.06
 const DEG = Math.PI / 180
+
+// Blason de face, en pixels
+export function emblemFrame(w, h, characters) {
+  const half = h / 2 / (MARGE * Math.max(FRONT_V, FRONT_H / (w / h)))
+  const vs = characters.map((c) => c.node.v)
+  const vc = (Math.max(...vs) + Math.min(...vs)) / 2
+  return { half, cx: w / 2, cy: h / 2 + vc * half }
+}
 const ORIGIN = new THREE.Vector3()
 
 function starTexture() {
@@ -818,9 +829,9 @@ export default class ConstellationScene {
     }
 
     const a = this.camera.aspect
-    const need = (v, h) => 1.06 * Math.max(v, h / a)
+    const need = (v, h) => MARGE * Math.max(v, h / a)
     const dEmblem = CAM_D - Z_EMBLEM
-    this.hFront = need(0.86 * EMBLEM / dEmblem, 0.76 * EMBLEM / dEmblem) * CAM_D
+    this.hFront = need(FRONT_V * EMBLEM / dEmblem, FRONT_H * EMBLEM / dEmblem) * CAM_D
     this.titleR = TITLE_PX / h
     const needSide = (e) => need(e.hy / (1 - this.titleR), e.hx) * D_SIDE
     this.hSide = { chrono: needSide(this.sideExt.chrono), traits: needSide(this.sideExt.traits) }

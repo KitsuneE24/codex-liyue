@@ -1,7 +1,7 @@
 import { ARMES } from '../data/labels.js'
 import { FILTRES_VIDES } from '../data/filters.js'
 
-export default function Filters({ doc, filters, onChange, count }) {
+export default function Filters({ doc, filters, onChange, count, searchRef }) {
   const set = (patch) => onChange({ ...filters, ...patch })
   const visions = [...new Set(doc.characters.map((c) => c.game.vision))].sort()
   const armes = [...new Set(doc.characters.map((c) => c.game.weapon))].sort()
@@ -12,6 +12,7 @@ export default function Filters({ doc, filters, onChange, count }) {
       <label className="filters__field filters__field--wide">
         <span>Rechercher</span>
         <input
+          ref={searchRef}
           type="search"
           value={filters.q}
           placeholder="nom, 汉字 ou pinyin"

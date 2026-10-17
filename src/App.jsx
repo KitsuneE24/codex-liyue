@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Constellation from './components/Constellation.jsx'
 import Sheet from './components/Sheet.jsx'
 import Filters from './components/Filters.jsx'
@@ -7,13 +7,29 @@ import useCorpus from './hooks/useCorpus.js'
 import useMediaQuery from './hooks/useMediaQuery.js'
 import { FILTRES_VIDES, normaliser } from './data/filters.js'
 
+function SearchIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+      <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" strokeWidth="2" />
+      <path d="M15.5 15.5 21 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 export default function App() {
   const { doc, error } = useCorpus()
   const [selectedId, setSelectedId] = useState(null)
   const [filters, setFilters] = useState(FILTRES_VIDES)
   const [panelOpen, setPanelOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(true)
   const mobile = useMediaQuery('(max-width: 760px)')
+  const searchRef = useRef(null)
   const close = useCallback(() => setSelectedId(null), [])
+  const select = useCallback((id) => {
+    setSelectedId(id)
+    setPanelOpen(false)
+    if (id) setCollapsed(true)
+  }, [])
 
   // Un seul prédicat, passé à la scène 3D et à l'index.
   const predicate = useCallback((c) => {
@@ -28,13 +44,30 @@ export default function App() {
     return true
   }, [filters])
 
+  // Sur desktop, le panneau déplié se replie dès qu'on agit ailleurs ou avec Échap.
+  useEffect(() => {
+    if (mobile || collapsed) return
+    const replier = (e) => {
+      if (e.type === 'keydown' ? e.key === 'Escape' : !e.target.closest('#panel')) {
+        setCollapsed(true)
+      }
+    }
+    document.addEventListener('pointerdown', replier)
+    document.addEventListener('keydown', replier)
+    return () => {
+      document.removeEventListener('pointerdown', replier)
+      document.removeEventListener('keydown', replier)
+    }
+  }, [mobile, collapsed])
+
   if (error) return <p className="status">Corpus introuvable : {error.message}</p>
   if (!doc) return <p className="status">Chargement…</p>
 
   const selected = doc.characters.find((c) => c.id === selectedId)
   const visibles = doc.characters.filter(predicate)
 
-  const panelHidden = mobile && !panelOpen
+  const rail = !mobile && collapsed
+  const filtered = visibles.length < doc.characters.length
 
   return (
     <>
@@ -44,10 +77,13 @@ export default function App() {
           className="panel-toggle"
           aria-expanded={panelOpen}
           aria-controls="panel"
-          onClick={() => setPanelOpen((o) => !o)}
+          onClick={() => {
+            setPanelOpen((o) => !o)
+            if (!panelOpen) requestAnimationFrame(() => searchRef.current?.focus({ preventScroll: true }))
+          }}
         >
-          <span aria-hidden="true">{panelOpen ? '×' : '☰'}</span>
-          <span className="sr-only">{panelOpen ? 'Fermer les filtres' : 'Filtres et index'}</span>
+          {panelOpen ? <span aria-hidden="true">×</span> : <SearchIcon />}
+          <span className="sr-only">{panelOpen ? 'Fermer la recherche' : 'Rechercher et filtrer'}</span>
         </button>
       )}
       {mobile && panelOpen && (
@@ -56,28 +92,46 @@ export default function App() {
 
       <aside
         id="panel"
-        className={`panel${panelOpen ? ' is-open' : ''}`}
-        inert={panelHidden}
+        className={`panel${panelOpen ? ' is-open' : ''}${rail ? ' is-rail' : ''}`}
+        inert={mobile && !panelOpen}
       >
         <h1 className="panel__title">
           <span lang="zh-CN">璃月图鉴</span> Codex Liyue
         </h1>
-        <Filters doc={doc} filters={filters} onChange={setFilters} count={visibles.length} />
+        {rail && (
+          <button
+            type="button"
+            className="panel__search"
+            title="Rechercher et filtrer"
+            onClick={() => {
+              setCollapsed(false)
+              requestAnimationFrame(() => searchRef.current?.focus({ preventScroll: true }))
+            }}
+          >
+            <SearchIcon />
+            {filtered && <span className="panel__badge" />}
+            <span className="sr-only">Rechercher et filtrer</span>
+          </button>
+        )}
+        <Filters
+          doc={doc}
+          filters={filters}
+          onChange={setFilters}
+          count={visibles.length}
+          searchRef={searchRef}
+        />
         <CharacterIndex
           characters={visibles}
-          elements={doc.elements}
           selectedId={selectedId}
-          onSelect={(id) => {
-            setSelectedId(id)
-            setPanelOpen(false)
-          }}
+          compact={rail}
+          onSelect={select}
         />
       </aside>
 
       <Constellation
         doc={doc}
         selectedId={selectedId}
-        onSelect={setSelectedId}
+        onSelect={select}
         predicate={predicate}
       />
 
